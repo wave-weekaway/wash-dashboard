@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-03-30T01:51:59Z",
-  "generated_display": "March 29, 2026 · 06:51 PM MT",
+  "generated_at": "2026-03-30T01:53:13Z",
+  "generated_display": "March 29, 2026 · 06:53 PM MT",
   "version": "1.1",
   "metrics": {
     "messages_drafted": 12,
@@ -11,7 +11,7 @@
     "total_mtd": 55998,
     "input_mtd": 41998,
     "output_mtd": 13999,
-    "cost_mtd": ".32",
-    "month": ""
+    "cost_mtd": "0.34",
+    "month": "March 2026"
   }
 }
