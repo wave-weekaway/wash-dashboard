@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-03-30T01:51:59Z",
+  "generated_display": "March 29, 2026 · 06:51 PM MT",
+  "version": "1.1",
+  "metrics": {
+    "messages_drafted": 12,
+    "webhooks_processed": 104,
+    "reminders_active": 1
+  },
+  "tokens": {
+    "total_mtd": 55998,
+    "input_mtd": 41998,
+    "output_mtd": 13999,
+    "cost_mtd": ".32",
+    "month": ""
+  }
+}
