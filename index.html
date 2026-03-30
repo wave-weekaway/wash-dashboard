@@ -495,9 +495,9 @@
   <div class="snapshot-banner">
     <div>
       <strong>System snapshot</strong> — Data refreshed nightly at 8:00 PM MT by WAVE cron.
-      Last updated: <strong>March 28, 2026 · 08:00 PM MT</strong>
+      Last updated: <strong id="snapshot-timestamp">Loading...</strong>
     </div>
-    <div class="snapshot-note">Static snapshot · Not real-time</div>
+    <div class="snapshot-note" id="snapshot-note">Fetching live data...</div>
   </div>
 
   <!-- LIFETIME METRICS -->
@@ -510,12 +510,12 @@
     <div class="metrics-grid">
       <div class="metric-card">
         <div class="metric-label">Messages Drafted</div>
-        <div class="metric-value">312</div>
+        <div class="metric-value" id="metric-messages">312</div>
         <div class="metric-sub">Guest responses by WAVE</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Webhooks Processed</div>
-        <div class="metric-value">1,840</div>
+        <div class="metric-value" id="metric-webhooks">1,840</div>
         <div class="metric-sub">Hospitable events handled</div>
       </div>
       <div class="metric-card">
@@ -561,22 +561,22 @@
         <div class="token-stats">
           <div class="token-stat">
             <div class="token-stat-label">Tokens Used</div>
-            <div class="token-stat-value">2.4M</div>
+            <div class="token-stat-value" id="token-total">2.4M</div>
             <div class="token-stat-sub">of 5M monthly est.</div>
           </div>
           <div class="token-stat">
             <div class="token-stat-label">Input Tokens</div>
-            <div class="token-stat-value">1.8M</div>
+            <div class="token-stat-value" id="token-input">1.8M</div>
             <div class="token-stat-sub">System + user prompts</div>
           </div>
           <div class="token-stat">
             <div class="token-stat-label">Output Tokens</div>
-            <div class="token-stat-value">610K</div>
+            <div class="token-stat-value" id="token-output">610K</div>
             <div class="token-stat-sub">WAVE responses</div>
           </div>
           <div class="token-stat">
             <div class="token-stat-label">Est. Cost MTD</div>
-            <div class="token-stat-value">$18.40</div>
+            <div class="token-stat-value" id="token-cost">$18.40</div>
             <div class="token-stat-sub">At Sonnet 4.6 rates</div>
           </div>
         </div>
@@ -1390,12 +1390,10 @@
 </div>
 
 <script>
+  // ── FEATURE FILTER ──
   function filterFeatures(category, btn) {
-    // Update active button
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
-    // Show/hide cards
     const cards = document.querySelectorAll('.feature-card');
     let visible = 0;
     cards.forEach(card => {
@@ -1406,10 +1404,60 @@
         card.setAttribute('data-hidden', 'true');
       }
     });
-
-    // Update count
     document.getElementById('feature-count').textContent = visible + ' live';
   }
+
+  // ── LIVE SNAPSHOT FETCH ──
+  function formatTokens(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(0) + 'K';
+    return n.toString();
+  }
+
+  function formatNumber(n) {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  async function loadSnapshot() {
+    const SNAPSHOT_URL = 'https://raw.githubusercontent.com/wave-weekaway/wash-dashboard/main/wave-snapshot.json';
+    try {
+      const res = await fetch(SNAPSHOT_URL + '?t=' + Date.now());
+      if (!res.ok) throw new Error('Not found');
+      const data = await res.json();
+
+      // Timestamp
+      document.getElementById('snapshot-timestamp').textContent = data.generated_display || data.generated_at;
+      document.getElementById('snapshot-note').textContent = 'Live data · Updated nightly';
+
+      // Metrics
+      if (data.metrics) {
+        if (data.metrics.messages_drafted !== undefined)
+          document.getElementById('metric-messages').textContent = formatNumber(data.metrics.messages_drafted);
+        if (data.metrics.webhooks_processed !== undefined)
+          document.getElementById('metric-webhooks').textContent = formatNumber(data.metrics.webhooks_processed);
+      }
+
+      // Tokens
+      if (data.tokens) {
+        if (data.tokens.total_mtd !== undefined)
+          document.getElementById('token-total').textContent = formatTokens(data.tokens.total_mtd);
+        if (data.tokens.input_mtd !== undefined)
+          document.getElementById('token-input').textContent = formatTokens(data.tokens.input_mtd);
+        if (data.tokens.output_mtd !== undefined)
+          document.getElementById('token-output').textContent = formatTokens(data.tokens.output_mtd);
+        if (data.tokens.cost_mtd !== undefined)
+          document.getElementById('token-cost').textContent = '$' + data.tokens.cost_mtd;
+      }
+
+    } catch (e) {
+      // Snapshot not yet available — keep static fallback values, update banner
+      document.getElementById('snapshot-timestamp').textContent = 'Awaiting first snapshot';
+      document.getElementById('snapshot-note').textContent = 'Static placeholder data';
+    }
+  }
+
+  // Load snapshot on page open
+  loadSnapshot();
 </script>
 
 </body>
