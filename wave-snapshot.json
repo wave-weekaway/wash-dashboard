@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-03-30T09:00:00Z",
-  "generated_display": "March 30, 2026 · 02:00 AM MT",
+  "generated_at": "2026-03-31T09:00:00Z",
+  "generated_display": "March 31, 2026 · 02:00 AM MT",
   "version": "1.1",
   "metrics": {
     "messages_drafted": 12,
@@ -8,10 +8,10 @@
     "reminders_active": 1
   },
   "tokens": {
-    "total_mtd": 55998,
-    "input_mtd": 41998,
-    "output_mtd": 13999,
-    "cost_mtd": "0.34",
+    "total_mtd": 180617,
+    "input_mtd": 135462,
+    "output_mtd": 45154,
+    "cost_mtd": "1.08",
     "month": "March 2026"
   }
 }
