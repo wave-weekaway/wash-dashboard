@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-04-03T09:00:00Z",
-  "generated_display": "April 03, 2026 · 02:00 AM MT",
+  "generated_at": "2026-04-04T09:00:01Z",
+  "generated_display": "April 04, 2026 · 02:00 AM MT",
   "version": "1.1",
   "metrics": {
-    "messages_drafted": 14,
-    "webhooks_processed": 128,
+    "messages_drafted": 15,
+    "webhooks_processed": 136,
     "reminders_active": 0
   },
   "tokens": {
-    "total_mtd": 14863,
-    "input_mtd": 11147,
-    "output_mtd": 3715,
-    "cost_mtd": "0.09",
+    "total_mtd": 63508,
+    "input_mtd": 47631,
+    "output_mtd": 15877,
+    "cost_mtd": "0.38",
     "month": "April 2026"
   }
 }
