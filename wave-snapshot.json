@@ -1,17 +1,27 @@
 {
-  "generated_at": "2026-04-05T18:53:40Z",
-  "generated_display": "April 05, 2026 · 11:53 AM MT",
-  "version": "1.1",
+  "generated_at": "2026-04-05T18:55:47Z",
+  "generated_display": "April 05, 2026 · 11:55 AM MT",
+  "version": "3.0",
   "metrics": {
     "messages_drafted": 15,
     "webhooks_processed": 136,
     "reminders_active": 0
   },
   "tokens": {
-    "total_mtd": 99138,
-    "input_mtd": 74353,
-    "output_mtd": 24784,
-    "cost_mtd": "0.59",
-    "month": "April 2026"
+    "input_mtd": 3834492,
+    "output_mtd": 71665,
+    "cost_mtd": "24.05",
+    "spend_limit": 100,
+    "month": "April 2026",
+    "period": "April 1 – 05, 2026",
+    "daily_costs": {"2026-04-01": 6.68, "2026-04-02": 2.5, "2026-04-03": 8.93, "2026-04-04": 5.94, "2026-04-05": 0.0}
+  },
+  "calendar": {
+    "summit": [],
+    "solstice": []
+  },
+  "ops": {
+    "summit": {"goal": 453633, "rev_full_month": 0.0, "commissions_full_month": 0.0, "net_full_month": 0.0, "rev_ytd": 0.0, "commissions_ytd": 0.0, "net_ytd": 0.0, "monthly_rev": [0.0, 0.0, 0.0, 0.0, null, null, null, null, null, null, null, null], "monthly_net": [0.0, 0.0, 0.0, 0.0, null, null, null, null, null, null, null, null], "error": null},
+    "solstice": {"goal": 382589, "rev_full_month": 0.0, "commissions_full_month": 0.0, "net_full_month": 0.0, "rev_ytd": 0.0, "commissions_ytd": 0.0, "net_ytd": 0.0, "monthly_rev": [0.0, 0.0, 0.0, 0.0, null, null, null, null, null, null, null, null], "monthly_net": [0.0, 0.0, 0.0, 0.0, null, null, null, null, null, null, null, null], "error": null}
   }
 }
