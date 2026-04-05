@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-04-05T18:56:50Z",
-  "generated_display": "April 05, 2026 · 11:56 AM MT",
+  "generated_at": "2026-04-05T19:00:42Z",
+  "generated_display": "April 05, 2026 · 12:00 PM MT",
   "version": "3.0",
   "metrics": {
     "messages_drafted": 15,
@@ -21,7 +21,7 @@
     "solstice": []
   },
   "ops": {
-    "summit": {"goal": 453633, "rev_full_month": 22211.0, "commissions_full_month": 3442.7, "net_full_month": 18768.3, "rev_ytd": -1838.21, "commissions_ytd": 13244.63, "net_ytd": -15082.84, "monthly_rev": [-1696.21, 24632.1, -142.0, 22211.0, null, null, null, null, null, null, null, null], "monthly_net": [-3225.5, 20916.49, -4699.03, 18768.3, null, null, null, null, null, null, null, null], "error": null},
-    "solstice": {"goal": 382589, "rev_full_month": 18979.92, "commissions_full_month": 2934.77, "net_full_month": 16045.15, "rev_ytd": 76.33, "commissions_ytd": 12336.34, "net_ytd": -12260.01, "monthly_rev": [15270.6, 20597.2, 76.33, 18979.92, null, null, null, null, null, null, null, null], "monthly_net": [12481.49, 17750.4, -3689.33, 16045.15, null, null, null, null, null, null, null, null], "error": null}
+    "summit": {"goal": 453633, "rev_full_month": 22211.0, "commissions_full_month": 3442.7, "net_full_month": 18768.3, "rev_ytd": 96798.64, "commissions_ytd": 15082.84, "net_ytd": 81715.8, "monthly_rev": [19566.59, 24632.1, 30388.95, 22211.0, null, null, null, null, null, null, null, null], "monthly_net": [16341.09, 20916.49, 25689.92, 18768.3, null, null, null, null, null, null, null, null], "error": null},
+    "solstice": {"goal": 382589, "rev_full_month": 18979.92, "commissions_full_month": 2934.77, "net_full_month": 16045.15, "rev_ytd": 78726.15, "commissions_ytd": 12260.01, "net_ytd": 66466.14, "monthly_rev": [15270.6, 20597.2, 23878.43, 18979.92, null, null, null, null, null, null, null, null], "monthly_net": [12481.49, 17750.4, 20189.1, 16045.15, null, null, null, null, null, null, null, null], "error": null}
   }
 }
