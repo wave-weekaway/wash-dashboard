@@ -17,6 +17,9 @@
     --yellow: #D8D294;
     --off-white: #F4F2EE;
     --white: #FAFAF8;
+    --dark-blue: #265D96;
+    --sky-blue: #5F93C0;
+    --light-blue: #C1D0E0;
     --border: rgba(55,70,61,0.15);
     --border-strong: rgba(55,70,61,0.25);
     --surface: rgba(55,70,61,0.04);
@@ -276,16 +279,16 @@
   .token-breakdown-item strong { color: rgba(255,255,255,0.7); }
 
   /* ── HEALTH GRID ── */
-  .health-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; background: rgba(139,155,145,0.2); border: 1px solid rgba(139,155,145,0.25); border-radius: 4px; overflow: hidden; }
+  .health-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; background: rgba(38,93,150,0.15); border: 1px solid rgba(38,93,150,0.2); border-radius: 4px; overflow: hidden; }
   .health-card { background: var(--white); padding: 20px; transition: background 0.15s; }
-  .health-card:hover { background: rgba(139,155,145,0.06); }
+  .health-card:hover { background: rgba(38,93,150,0.04); }
   .health-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-  .health-card-icon { width: 32px; height: 32px; border: 1px solid rgba(139,155,145,0.3); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .health-card-icon { width: 32px; height: 32px; border: 1px solid rgba(38,93,150,0.2); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
   .health-card h4 { font-size: 13px; font-weight: bold; color: var(--black); margin-bottom: 3px; }
   .health-card p { font-size: 11px; color: var(--dark-grey); line-height: 1.5; }
-  .health-card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(139,155,145,0.2); }
+  .health-card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(38,93,150,0.1); }
   .health-uptime { font-size: 11px; color: var(--dark-grey); }
-  .health-uptime strong { color: var(--forest-green); font-size: 13px; }
+  .health-uptime strong { color: var(--dark-blue); font-size: 13px; }
 
   /* ── MIND MAP ARCHITECTURE ── */
   .arch-panel { padding: 36px; position: relative; overflow: hidden; }
@@ -541,6 +544,34 @@
   .page { display: none; }
   .page.active { display: block; }
 
+  /* ── OPS SUBNAV ── */
+  .ops-subnav {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+  .ops-subnav-item {
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--forest-green);
+    background: var(--white);
+    border-radius: 3px;
+    padding: 6px 12px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(55,70,61,0.07);
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+  }
+  .ops-subnav-item:hover {
+    background: var(--forest-green);
+    color: rgba(255,255,255,0.95);
+    box-shadow: 0 3px 8px rgba(55,70,61,0.15);
+  }
+
   /* ── PROPERTY KPI COLUMNS ── */
   .prop-columns {
     display: grid;
@@ -560,9 +591,14 @@
     align-items: center;
     gap: 10px;
   }
+  .prop-col-header.forest  { background: var(--forest-green); }
+  .prop-col-header.blue    { background: var(--dark-blue); }
+  .prop-col-header.sky     { background: var(--sky-blue); }
+  .prop-col-header.red     { background: var(--dark-red); }
+  .prop-col-header.yellow  { background: #8a7d3a; }
   .prop-col-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .prop-col-name { font-size: 13px; font-weight: bold; color: rgba(255,255,255,0.95); flex: 1; }
-  .prop-col-addr { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.04em; }
+  .prop-col-addr { font-size: 10px; color: rgba(255,255,255,0.45); letter-spacing: 0.04em; }
   .prop-kpi-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -732,6 +768,53 @@
     .calendars-grid { grid-template-columns: 1fr; }
     .cal-day { font-size: 10px; }
   }
+  .yoy { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:bold; margin-top:6px; }
+  .yoy.up   { color:#2d7a30; }
+  .yoy.down { color:var(--dark-red); }
+  .yoy.flat { color:var(--light-grey); }
+
+  /* ══════════════════════════════════════════
+     PAGE-SCOPED THEMES
+  ══════════════════════════════════════════ */
+
+  /* WAVE System page — blue accent */
+  #page-wave .section-label  { color: var(--dark-blue); }
+  #page-wave .section-line   { background: var(--sky-blue); opacity: 0.3; }
+  #page-wave .section-count  { color: var(--sky-blue); }
+  #page-wave .metric-card::before { background: var(--dark-blue); }
+  #page-wave .metric-label   { color: var(--sky-blue); }
+  #page-wave .metric-value   { color: var(--dark-blue); }
+  #page-wave .snapshot-banner strong { color: var(--dark-blue); }
+  #page-wave .snapshot-note  { color: var(--sky-blue); }
+  #page-wave .changelog-version-num  { color: var(--dark-blue); }
+  #page-wave .changelog-version-date { color: var(--sky-blue); }
+  #page-wave .changelog-chevron      { color: var(--sky-blue); }
+  #page-wave .changelog-bullet       { background: var(--sky-blue); }
+  #page-wave .changelog-items        { background: rgba(38,93,150,0.03); }
+  #page-wave .changelog-version      { border-bottom: 1px solid rgba(38,93,150,0.12); }
+  #page-wave .changelog              { border: 1px solid rgba(38,93,150,0.2); }
+  #page-wave .feature-card-footer    { border-top: 1px solid rgba(38,93,150,0.1); }
+  #page-wave .feature-card-meta      { color: var(--sky-blue); }
+  #page-wave .feature-tag            { color: var(--dark-blue); background: rgba(38,93,150,0.07); border-color: rgba(38,93,150,0.15); }
+  #page-wave .ornament               { color: var(--sky-blue); opacity: 0.5; }
+  #page-wave .ornament::before,
+  #page-wave .ornament::after        { background: rgba(38,93,150,0.2); }
+  #page-wave .footer-brand           { color: var(--sky-blue); }
+  #page-wave .footer-brand strong    { color: var(--dark-blue); }
+  #page-wave .header-eyebrow         { color: var(--dark-blue); }
+  #page-wave .header-divider         { background: var(--dark-blue); }
+  #page-wave .version-pill           { background: var(--dark-blue); }
+  #page-wave .api-table th           { background: var(--dark-blue); }
+  #page-wave .roadmap-card:hover     { box-shadow: 0 4px 12px rgba(38,93,150,0.12); }
+
+  /* Property Operations page — green accent */
+  #page-ops .section-label   { color: var(--forest-green); }
+  #page-ops .header-eyebrow  { color: var(--forest-green); }
+  #page-ops .header-divider  { background: var(--forest-green); }
+  #page-ops .snapshot-banner strong { color: var(--forest-green); }
+  #page-ops .footer-brand    { color: var(--light-green); }
+  #page-ops .footer-brand strong { color: var(--forest-green); }
+
   /* ══════════════════════════════════════════
      ANIMATIONS
   ══════════════════════════════════════════ */
@@ -1872,8 +1955,54 @@
     <div class="snapshot-note" id="ops-snapshot-note">Fetching live data...</div>
   </div>
 
+  <!-- OPS SUBNAV -->
+  <nav class="ops-subnav">
+    <a class="ops-subnav-item" href="#sec-portfolio">Portfolio</a>
+    <a class="ops-subnav-item" href="#sec-monthly">Monthly</a>
+    <a class="ops-subnav-item" href="#sec-goals">Goals</a>
+    <a class="ops-subnav-item" href="#sec-untapped">Untapped</a>
+    <a class="ops-subnav-item" href="#sec-chart">Revenue Chart</a>
+    <a class="ops-subnav-item" href="#sec-occupancy">Occupancy</a>
+    <a class="ops-subnav-item" href="#sec-gaps">Gaps</a>
+    <a class="ops-subnav-item" href="#sec-calendars">Calendars</a>
+  </nav>
+
+  <!-- COMBINED PORTFOLIO KPIs -->
+  <div class="section" id="sec-portfolio">
+    <div class="section-header">
+      <div class="section-label">Portfolio Summary</div>
+      <div class="section-line"></div>
+      <div class="section-count">Both properties combined · QuickBooks</div>
+      <div class="source-pill qbo" style="font-size:9px;">QuickBooks</div>
+    </div>
+    <div class="metrics-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
+      <div class="metric-card">
+        <div class="metric-label">Revenue — Full Month</div>
+        <div class="metric-value" id="combined-rev-mtd">$—</div>
+        <div class="metric-sub" id="combined-rev-mtd-month">Both properties</div>
+        <div class="yoy" id="combined-rev-mtd-yoy" style="margin-top:8px;"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Revenue — Full Year</div>
+        <div class="metric-value" id="combined-rev-ytd">$—</div>
+        <div class="metric-sub">Jan 1 – Dec 31, 2026</div>
+        <div class="yoy" id="combined-rev-ytd-yoy" style="margin-top:8px;"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Net After Commissions</div>
+        <div class="metric-value" id="combined-net-mtd">$—</div>
+        <div class="metric-sub">Full month · After platform fees</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Goal Progress</div>
+        <div class="metric-value" id="combined-goal-pct">—%</div>
+        <div class="metric-sub" id="combined-goal-sub">of $836,222 combined goal</div>
+      </div>
+    </div>
+  </div>
+
   <!-- PROPERTY KPI COLUMNS -->
-  <div class="section">
+  <div class="section" id="sec-monthly">
     <div class="section-header">
       <div class="section-label">Current Month — <span id="kpi-month-label" style="font-style:normal;text-transform:none;letter-spacing:0">April 2026</span></div>
       <div class="section-line"></div>
@@ -1884,8 +2013,8 @@
 
       <!-- SUMMIT -->
       <div class="prop-col">
-        <div class="prop-col-header">
-          <div class="prop-col-dot" style="background:var(--dark-green)"></div>
+        <div class="prop-col-header forest">
+          <div class="prop-col-dot" style="background:rgba(255,255,255,0.6)"></div>
           <div class="prop-col-name">Sisters' Summit</div>
           <div class="prop-col-addr">1402 2nd Ave</div>
         </div>
@@ -1894,12 +2023,14 @@
             <div class="prop-kpi-label">Revenue — Full Month</div>
             <div class="prop-kpi-value" id="s-rev-mtd">$—</div>
             <div class="prop-kpi-sub">Gross incl. cleaning fee</div>
+            <div class="yoy" id="s-rev-mtd-yoy"></div>
             <div class="source-pill qbo">QuickBooks</div>
           </div>
           <div class="prop-kpi-card">
             <div class="prop-kpi-label">Revenue YTD</div>
             <div class="prop-kpi-value" id="s-rev-ytd">$—</div>
             <div class="prop-kpi-sub">Jan 1 to end of current month</div>
+            <div class="yoy" id="s-rev-ytd-yoy"></div>
             <div class="source-pill qbo">QuickBooks</div>
           </div>
           <div class="prop-kpi-card">
@@ -1919,8 +2050,8 @@
 
       <!-- SOLSTICE -->
       <div class="prop-col">
-        <div class="prop-col-header">
-          <div class="prop-col-dot" style="background:var(--forest-green)"></div>
+        <div class="prop-col-header" style="background:var(--light-green)">
+          <div class="prop-col-dot" style="background:rgba(255,255,255,0.6)"></div>
           <div class="prop-col-name">Sisters' Solstice</div>
           <div class="prop-col-addr">1434 2nd Ave</div>
         </div>
@@ -1929,12 +2060,14 @@
             <div class="prop-kpi-label">Revenue — Full Month</div>
             <div class="prop-kpi-value" id="sol-rev-mtd">$—</div>
             <div class="prop-kpi-sub">Gross incl. cleaning fee</div>
+            <div class="yoy" id="sol-rev-mtd-yoy"></div>
             <div class="source-pill qbo">QuickBooks</div>
           </div>
           <div class="prop-kpi-card">
             <div class="prop-kpi-label">Revenue YTD</div>
             <div class="prop-kpi-value" id="sol-rev-ytd">$—</div>
             <div class="prop-kpi-sub">Jan 1 to end of current month</div>
+            <div class="yoy" id="sol-rev-ytd-yoy"></div>
             <div class="source-pill qbo">QuickBooks</div>
           </div>
           <div class="prop-kpi-card">
@@ -1956,7 +2089,7 @@
   </div>
 
   <!-- ANNUAL GOAL TRACKER -->
-  <div class="section">
+  <div class="section" id="sec-goals">
     <div class="section-header">
       <div class="section-label">Annual Goal Tracker</div>
       <div class="section-line"></div>
@@ -1967,8 +2100,8 @@
 
       <!-- SUMMIT GOAL -->
       <div class="prop-col">
-        <div class="prop-col-header">
-          <div class="prop-col-dot" style="background:var(--dark-green)"></div>
+        <div class="prop-col-header blue">
+          <div class="prop-col-dot" style="background:rgba(255,255,255,0.6)"></div>
           <div class="prop-col-name">Sisters' Summit</div>
           <div class="prop-col-addr">Goal: $453,633</div>
         </div>
@@ -1995,8 +2128,8 @@
 
       <!-- SOLSTICE GOAL -->
       <div class="prop-col">
-        <div class="prop-col-header">
-          <div class="prop-col-dot" style="background:var(--forest-green)"></div>
+        <div class="prop-col-header sky">
+          <div class="prop-col-dot" style="background:rgba(255,255,255,0.6)"></div>
           <div class="prop-col-name">Sisters' Solstice</div>
           <div class="prop-col-addr">Goal: $382,589</div>
         </div>
@@ -2024,7 +2157,88 @@
     </div>
   </div>
 
-  <!-- ANNUAL REVENUE CHART -->
+  <!-- UNTAPPED REVENUE POTENTIAL -->
+  <div class="section" id="sec-untapped">
+    <div class="section-header">
+      <div class="section-label">Untapped Revenue Potential</div>
+      <div class="section-line"></div>
+      <div class="section-count">Open nights remaining · EOY</div>
+      <div class="source-pill hospitable" style="font-size:9px;">Hospitable</div>
+    </div>
+    <div class="prop-columns">
+
+      <!-- SUMMIT UNTAPPED -->
+      <div class="prop-col">
+        <div class="prop-col-header red">
+          <div class="prop-col-dot" style="background:rgba(255,255,255,0.6)"></div>
+          <div class="prop-col-name">Sisters' Summit</div>
+          <div class="prop-col-addr">At current PriceLabs rates</div>
+        </div>
+        <div style="padding:20px;">
+
+          <!-- Top stats row -->
+          <div style="display:flex;gap:12px;margin-bottom:18px;">
+            <div style="flex:1;background:rgba(139,155,145,0.08);border-radius:4px;padding:14px;">
+              <div style="font-size:10px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:var(--light-green);margin-bottom:6px;">Open Nights</div>
+              <div style="font-size:26px;font-weight:bold;color:var(--dark-green);letter-spacing:-0.02em;" id="s-open-nights">—</div>
+              <div style="font-size:10px;color:var(--light-green);margin-top:2px;">remaining this year</div>
+            </div>
+            <div style="flex:1;background:rgba(139,155,145,0.08);border-radius:4px;padding:14px;">
+              <div style="font-size:10px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:var(--light-green);margin-bottom:6px;">Gross Potential Revenue</div>
+              <div style="font-size:26px;font-weight:bold;color:var(--dark-green);letter-spacing:-0.02em;" id="s-open-revenue">$—</div>
+              <div style="font-size:10px;color:var(--light-green);margin-top:2px;">at current nightly rates</div>
+            </div>
+          </div>
+
+          <!-- Need to capture bar -->
+          <div style="font-size:11px;color:var(--light-green);margin-bottom:6px;display:flex;justify-content:space-between;">
+            <span>Need to capture to hit goal</span>
+            <span id="s-need-pct" style="font-weight:bold;color:var(--forest-green);">—%</span>
+          </div>
+          <div style="height:8px;background:rgba(139,155,145,0.15);border-radius:4px;overflow:hidden;margin-bottom:8px;">
+            <div id="s-need-bar" style="height:100%;border-radius:4px;width:0%;background:linear-gradient(90deg,var(--yellow),#c8ba7a);transition:width 0.8s ease;"></div>
+          </div>
+          <div style="font-size:11px;color:var(--light-green);" id="s-need-label">Calculating...</div>
+
+        </div>
+      </div>
+
+      <!-- SOLSTICE UNTAPPED -->
+      <div class="prop-col">
+        <div class="prop-col-header" style="background:var(--light-red)">
+          <div class="prop-col-dot" style="background:rgba(255,255,255,0.6)"></div>
+          <div class="prop-col-name">Sisters' Solstice</div>
+          <div class="prop-col-addr">At current PriceLabs rates</div>
+        </div>
+        <div style="padding:20px;">
+
+          <div style="display:flex;gap:12px;margin-bottom:18px;">
+            <div style="flex:1;background:rgba(139,155,145,0.08);border-radius:4px;padding:14px;">
+              <div style="font-size:10px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:var(--light-green);margin-bottom:6px;">Open Nights</div>
+              <div style="font-size:26px;font-weight:bold;color:var(--dark-green);letter-spacing:-0.02em;" id="sol-open-nights">—</div>
+              <div style="font-size:10px;color:var(--light-green);margin-top:2px;">remaining this year</div>
+            </div>
+            <div style="flex:1;background:rgba(139,155,145,0.08);border-radius:4px;padding:14px;">
+              <div style="font-size:10px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:var(--light-green);margin-bottom:6px;">Gross Potential Revenue</div>
+              <div style="font-size:26px;font-weight:bold;color:var(--dark-green);letter-spacing:-0.02em;" id="sol-open-revenue">$—</div>
+              <div style="font-size:10px;color:var(--light-green);margin-top:2px;">at current nightly rates</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:var(--light-green);margin-bottom:6px;display:flex;justify-content:space-between;">
+            <span>Need to capture to hit goal</span>
+            <span id="sol-need-pct" style="font-weight:bold;color:var(--forest-green);">—%</span>
+          </div>
+          <div style="height:8px;background:rgba(139,155,145,0.15);border-radius:4px;overflow:hidden;margin-bottom:8px;">
+            <div id="sol-need-bar" style="height:100%;border-radius:4px;width:0%;background:linear-gradient(90deg,var(--yellow),#c8ba7a);transition:width 0.8s ease;"></div>
+          </div>
+          <div style="font-size:11px;color:var(--light-green);" id="sol-need-label">Calculating...</div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
   <div class="section">
     <div class="section-header">
       <div class="section-label">Annual Revenue</div>
@@ -2074,7 +2288,7 @@
   </div>
 
   <!-- OCCUPANCY BARS -->
-  <div class="section">
+  <div class="section" id="sec-occupancy">
     <div class="section-header">
       <div class="section-label">Occupancy Forecast</div>
       <div class="section-line"></div>
@@ -2123,7 +2337,7 @@
   </div>
 
   <!-- BOOKING GAPS -->
-  <div class="section">
+  <div class="section" id="sec-gaps">
     <div class="section-header">
       <div class="section-label">Booking Gaps</div>
       <div class="section-line"></div>
@@ -2138,7 +2352,7 @@
   </div>
 
   <!-- CALENDARS -->
-  <div class="section">
+  <div class="section" id="sec-calendars">
     <div class="section-header">
       <div class="section-label">Availability Calendars</div>
       <div class="section-line"></div>
@@ -2529,9 +2743,40 @@
     const el = document.getElementById('kpi-month-label');
     if (el) el.textContent = monthLabel;
 
-    // ── Per-property KPIs from QBO ──
+    // ── Per-property data from QBO ──
     const summitOps   = ops.summit   || {};
     const solsticeOps = ops.solstice || {};
+
+    // ── Combined portfolio KPIs ──
+    const COMBINED_GOAL = 453633 + 382589; // 836,222
+    const combinedRevMtd  = (summitOps.rev_full_month  || 0) + (solsticeOps.rev_full_month  || 0);
+    const combinedRevYtd  = (summitOps.rev_ytd         || 0) + (solsticeOps.rev_ytd         || 0);
+    const combinedNetMtd  = (summitOps.net_full_month  || 0) + (solsticeOps.net_full_month  || 0);
+    const combinedPriorMtd  = (summitOps.rev_same_month_prior || 0) + (solsticeOps.rev_same_month_prior || 0);
+    const combinedPriorYtd  = (summitOps.rev_full_year_prior  || 0) + (solsticeOps.rev_full_year_prior  || 0);
+    const combinedGoalPct   = combinedRevYtd > 0 ? Math.round((combinedRevYtd / COMBINED_GOAL) * 100) : null;
+
+    const elCombMtd  = document.getElementById('combined-rev-mtd');
+    const elCombYtd  = document.getElementById('combined-rev-ytd');
+    const elCombNet  = document.getElementById('combined-net-mtd');
+    const elCombGoal = document.getElementById('combined-goal-pct');
+    const elCombSub  = document.getElementById('combined-goal-sub');
+    const elCombMonth = document.getElementById('combined-rev-mtd-month');
+
+    if (elCombMtd)  elCombMtd.textContent  = combinedRevMtd  > 0 ? fmtK(combinedRevMtd)  : '$—';
+    if (elCombYtd)  elCombYtd.textContent  = combinedRevYtd  > 0 ? fmtK(combinedRevYtd)  : '$—';
+    if (elCombNet)  elCombNet.textContent  = combinedNetMtd  > 0 ? fmtK(combinedNetMtd)  : '$—';
+    if (elCombGoal) elCombGoal.textContent = combinedGoalPct !== null ? combinedGoalPct + '%' : '—%';
+    if (elCombMonth) elCombMonth.textContent = monthLabel + ' · Both properties';
+    if (elCombSub && combinedRevYtd > 0) {
+      const remaining = Math.max(COMBINED_GOAL - combinedRevYtd, 0);
+      elCombSub.textContent = fmtK(remaining) + ' remaining of $836K goal';
+    }
+
+    renderYoY('combined-rev-mtd-yoy', combinedRevMtd, combinedPriorMtd > 0 ? combinedPriorMtd : null);
+    renderYoY('combined-rev-ytd-yoy', combinedRevYtd, combinedPriorYtd > 0 ? combinedPriorYtd : null);
+
+    // ── Per-property KPIs from QBO ──
 
     function setKpi(id, val) {
       const el = document.getElementById(id);
@@ -2551,6 +2796,25 @@
     setKpi('sol-rev-mtd', solsticeOps.rev_full_month);
     setKpi('sol-rev-ytd', solsticeOps.rev_ytd);
     setKpi('sol-net-mtd', solsticeOps.net_full_month);
+
+    // ── YoY indicators ──
+    function renderYoY(id, current, prior) {
+      const el = document.getElementById(id);
+      if (!el || current === null || current === undefined || !prior) return;
+      const diff = current - prior;
+      const pct  = Math.abs(Math.round((diff / prior) * 100));
+      const up   = diff >= 0;
+      const arrow = up ? '▲' : '▼';
+      const cls   = pct === 0 ? 'flat' : up ? 'up' : 'down';
+      const priorYear = now.getFullYear() - 1;
+      el.className = 'yoy ' + cls;
+      el.innerHTML = `${arrow} ${pct}% vs ${priorYear} · ${up ? '+' : '-'}${fmtK(Math.abs(diff))}`;
+    }
+
+    renderYoY('s-rev-mtd-yoy',   summitOps.rev_full_month,   summitOps.rev_same_month_prior);
+    renderYoY('s-rev-ytd-yoy',   summitOps.rev_ytd,          summitOps.rev_full_year_prior);
+    renderYoY('sol-rev-mtd-yoy', solsticeOps.rev_full_month, solsticeOps.rev_same_month_prior);
+    renderYoY('sol-rev-ytd-yoy', solsticeOps.rev_ytd,        solsticeOps.rev_full_year_prior);
 
     // ── Goal tracker ──
     const SUMMIT_GOAL   = summitOps.goal   || 453633;
@@ -2616,7 +2880,70 @@
     if (sOccSub) sOccSub.textContent = sMonthOcc.booked + ' of ' + sMonthOcc.total + ' nights';
     if (solOccSub) solOccSub.textContent = solMonthOcc.booked + ' of ' + solMonthOcc.total + ' nights';
 
-    // ── Occupancy forecast bars ──
+    // ── Untapped revenue potential ──
+    const calData = data.calendar || {};
+    const sOpen   = calData.summit_open   || { open_nights: 0, open_revenue: 0 };
+    const solOpen = calData.solstice_open || { open_nights: 0, open_revenue: 0 };
+
+    function renderUntapped(openNights, openRevenue, ytd, goal,
+                            idNights, idRevenue, idNeedPct, idNeedBar, idNeedLabel) {
+      const elNights  = document.getElementById(idNights);
+      const elRev     = document.getElementById(idRevenue);
+      const elPct     = document.getElementById(idNeedPct);
+      const elBar     = document.getElementById(idNeedBar);
+      const elLabel   = document.getElementById(idNeedLabel);
+
+      if (elNights) elNights.textContent = openNights > 0 ? openNights : '—';
+      if (elRev)    elRev.textContent    = openRevenue > 0 ? fmtK(openRevenue) : '$—';
+
+      if (ytd !== null && ytd !== undefined && goal && openRevenue > 0) {
+        const gap        = Math.max(goal - ytd, 0);
+        const rawPct     = Math.round((gap / openRevenue) * 100);
+        const capturable = gap <= openRevenue;
+
+        // Label above bar
+        if (elPct) elPct.textContent = capturable
+          ? rawPct + '% of open inventory needed'
+          : 'Exceeds open inventory';
+
+        // Bar — capped at 100% visually, red if unreachable
+        if (elBar) {
+          setTimeout(() => {
+            elBar.style.width = Math.min(rawPct, 100) + '%';
+            if (!capturable) {
+              elBar.style.background = 'linear-gradient(90deg, var(--dark-red), var(--light-red))';
+            } else if (rawPct > 75) {
+              elBar.style.background = 'linear-gradient(90deg, #c8a030, var(--yellow))';
+            } else {
+              elBar.style.background = 'linear-gradient(90deg, var(--forest-green), var(--light-green))';
+            }
+          }, 150);
+        }
+
+        // Plain English label below bar
+        if (elLabel) {
+          if (gap <= 0) {
+            elLabel.textContent = '✓ Goal already achieved this year';
+            elLabel.style.color = '#2d7a30';
+          } else if (capturable) {
+            elLabel.textContent = fmtK(gap) + ' still needed · ' + fmtK(openRevenue - gap) + ' of open inventory is buffer';
+            elLabel.style.color = rawPct > 75 ? 'var(--dark-red)' : 'var(--light-green)';
+          } else {
+            elLabel.textContent = fmtK(gap) + ' needed but only ' + fmtK(openRevenue) + ' of open inventory remains — pricing or new bookings required';
+            elLabel.style.color = 'var(--dark-red)';
+          }
+        }
+      }
+    }
+
+    renderUntapped(
+      sOpen.open_nights, sOpen.open_revenue, summitOps.rev_ytd, 453633,
+      's-open-nights', 's-open-revenue', 's-need-pct', 's-need-bar', 's-need-label'
+    );
+    renderUntapped(
+      solOpen.open_nights, solOpen.open_revenue, solsticeOps.rev_ytd, 382589,
+      'sol-open-nights', 'sol-open-revenue', 'sol-need-pct', 'sol-need-bar', 'sol-need-label'
+    );
     function calcOcc(dates, days) {
       const today = new Date();
       const bookedSet = new Set(dates);
