@@ -713,6 +713,44 @@
   .gap-rec.moderate { background: rgba(216,210,148,0.25); color: #7a6000; }
   .gap-rec.notice   { background: rgba(80,105,89,0.1); color: var(--forest-green); }
 
+  /* Gaps mobile — card per row */
+  @media (max-width: 640px) {
+    .gaps-table thead { display: none; }
+    .gaps-table, .gaps-table tbody, .gaps-table tr, .gaps-table td { display: block; width: 100%; }
+    .gaps-table tbody tr {
+      background: var(--white);
+      border-radius: 4px;
+      margin-bottom: 10px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 3px rgba(55,70,61,0.07);
+      border-bottom: none;
+    }
+    .gaps-table td {
+      padding: 4px 0;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gaps-table td::before {
+      content: attr(data-label);
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--light-green);
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+    .gaps-table td:first-child { margin-bottom: 4px; }
+  }
+
+  /* Revenue chart mobile height */
+  @media (max-width: 600px) {
+    #rev-chart { height: 220px !important; }
+    #rev-chart-container { height: 220px !important; }
+  }
+
   /* Calendar */
   .calendars-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 24px; }
   .cal-card { background: var(--white); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(55,70,61,0.07); }
@@ -2254,7 +2292,7 @@
             </div>
           </div>
         </div>
-        <div style="position:relative;height:160px;width:100%;overflow:hidden;">
+        <div id="rev-chart-container" style="position:relative;height:160px;width:100%;overflow:hidden;">
           <canvas id="rev-chart" style="width:100%;height:160px;display:block;"></canvas>
         </div>
         <div id="rev-chart-tooltip" style="position:fixed;display:none;background:rgba(30,40,35,0.92);border:1px solid rgba(55,70,61,0.2);padding:8px 12px;border-radius:4px;font-size:11px;color:rgba(255,255,255,0.9);pointer-events:none;z-index:99;line-height:1.8;"></div>
@@ -2597,7 +2635,9 @@
     if (!canvas) return;
     const dpr = window.devicePixelRatio || 1;
     const W = canvas.parentElement ? canvas.parentElement.offsetWidth : (canvas.offsetWidth || 300);
-    const H = 160;
+    const H = window.innerWidth <= 600 ? 220 : 160;
+    canvas.style.height = H + 'px';
+    if (canvas.parentElement) canvas.parentElement.style.height = H + 'px';
     canvas.width = W * dpr; canvas.height = H * dpr;
     canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     const ctx = canvas.getContext('2d');
@@ -3020,6 +3060,7 @@
     if (allGaps.length === 0) {
       gapsList.innerHTML = '<div style="padding:24px;text-align:center;color:var(--light-grey);font-size:13px;background:var(--white);border-radius:4px;box-shadow:0 1px 3px rgba(55,70,61,0.07);">No gaps of 2+ nights in the next 90 days.</div>';
     } else {
+      const SHOW_FIRST = 5;
       const recLabel = (nights) => {
         if (nights >= 7) return { cls: 'urgent',   text: 'Price drop — fill urgently' };
         if (nights >= 4) return { cls: 'moderate', text: 'Review pricing & min stay' };
@@ -3027,30 +3068,44 @@
       };
       const potLabel = (nights) => '$' + (nights * 500).toLocaleString() + ' potential';
 
+      const renderRows = (gaps) => gaps.map(g => {
+        const rec = recLabel(g.nights);
+        return `<tr>
+          <td data-label="Nights"><span class="gap-nights-pill ${rec.cls}">${g.nights}n</span></td>
+          <td data-label="Dates"><strong>${fmtGapDate(g.start)}</strong> – ${fmtGapDate(g.end)}</td>
+          <td data-label="Property">${g.property}</td>
+          <td data-label="Est. Potential" style="color:var(--forest-green);font-weight:bold;">${potLabel(g.nights)}</td>
+          <td data-label="Action"><span class="gap-rec ${rec.cls}">${rec.text}</span></td>
+        </tr>`;
+      }).join('');
+
+      const visible = allGaps.slice(0, SHOW_FIRST);
+      const hidden  = allGaps.slice(SHOW_FIRST);
+      const hasMore = hidden.length > 0;
+
       gapsList.innerHTML = `
         <table class="gaps-table">
           <thead>
             <tr>
-              <th>Nights</th>
-              <th>Dates</th>
-              <th>Property</th>
-              <th>Est. Potential</th>
-              <th>Recommended Action</th>
+              <th>Nights</th><th>Dates</th><th>Property</th><th>Est. Potential</th><th>Recommended Action</th>
             </tr>
           </thead>
-          <tbody>
-            ${allGaps.map(g => {
-              const rec = recLabel(g.nights);
-              return `<tr>
-                <td><span class="gap-nights-pill ${rec.cls}">${g.nights}n</span></td>
-                <td><strong>${fmtGapDate(g.start)}</strong> – ${fmtGapDate(g.end)}</td>
-                <td>${g.property}</td>
-                <td style="color:var(--forest-green);font-weight:bold;">${potLabel(g.nights)}</td>
-                <td><span class="gap-rec ${rec.cls}">${rec.text}</span></td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>`;
+          <tbody id="gaps-visible">${renderRows(visible)}</tbody>
+          ${hasMore ? `<tbody id="gaps-hidden" style="display:none;">${renderRows(hidden)}</tbody>` : ''}
+        </table>
+        ${hasMore ? `
+        <div style="text-align:center;margin-top:12px;">
+          <button id="gaps-toggle" onclick="
+            const h=document.getElementById('gaps-hidden');
+            const btn=document.getElementById('gaps-toggle');
+            const showing=h.style.display!=='none';
+            h.style.display=showing?'none':'table-row-group';
+            btn.textContent=showing?'Show ${hidden.length} more gaps ▾':'Show less ▴';
+          " style="background:none;border:1px solid rgba(139,155,145,0.35);color:var(--forest-green);font-size:11px;font-weight:bold;letter-spacing:0.06em;padding:7px 18px;border-radius:3px;cursor:pointer;">
+            Show ${hidden.length} more gap${hidden.length !== 1 ? 's' : ''} ▾
+          </button>
+        </div>` : ''}
+      `;
     }
 
     // ── Calendars ──
