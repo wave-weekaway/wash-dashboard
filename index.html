@@ -596,6 +596,8 @@
   .prop-col-header.sky     { background: var(--sky-blue); }
   .prop-col-header.red     { background: var(--dark-red); }
   .prop-col-header.yellow  { background: #8a7d3a; }
+  /* Light backgrounds need dark text */
+
   .prop-col-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .prop-col-name { font-size: 13px; font-weight: bold; color: rgba(255,255,255,0.95); flex: 1; }
   .prop-col-addr { font-size: 10px; color: rgba(255,255,255,0.45); letter-spacing: 0.04em; }
@@ -693,33 +695,23 @@
   .occ-fill.low { background: linear-gradient(90deg, var(--light-green), #c0bfbf); }
   .occ-nights { font-size: 10px; color: var(--light-green); margin-top: 4px; }
 
-  /* Gaps */
-  .gaps-list { display: flex; flex-direction: column; gap: 10px; }
-  .gap-item {
-    background: var(--white);
-    border-radius: 4px; padding: 16px 18px;
-    display: flex; align-items: center; gap: 16px;
-    flex-wrap: wrap;
-    box-shadow: 0 1px 3px rgba(55,70,61,0.07);
-    transition: box-shadow 0.15s;
-  }
-  .gap-item:hover { box-shadow: 0 4px 12px rgba(55,70,61,0.11); }
-  .gap-item.urgent { border-left: 3px solid var(--dark-red); }
-  .gap-item.moderate { border-left: 3px solid var(--yellow); }
-  .gap-item.notice { border-left: 3px solid var(--forest-green); }
-  .gap-nights-badge {
-    min-width: 44px; height: 44px;
-    background: var(--dark-green); color: var(--off-white);
-    border-radius: 4px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    font-size: 18px; font-weight: bold; line-height: 1;
-    flex-shrink: 0;
-  }
-  .gap-nights-badge span { font-size: 9px; font-weight: normal; opacity: 0.6; }
-  .gap-info { flex: 1; min-width: 0; }
-  .gap-dates { font-size: 13px; font-weight: bold; color: var(--black); }
-  .gap-property { font-size: 11px; color: var(--dark-grey); margin-top: 2px; }
-  .gap-action { font-size: 11px; color: var(--forest-green); font-weight: bold; letter-spacing: 0.04em; flex-shrink: 0; }
+  /* Gaps — table format */
+  .gaps-table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(55,70,61,0.07); }
+  .gaps-table thead tr { background: var(--dark-green); }
+  .gaps-table thead th { padding: 11px 16px; font-size: 10px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.7); text-align: left; white-space: nowrap; }
+  .gaps-table tbody tr { border-bottom: 1px solid rgba(139,155,145,0.15); transition: background 0.12s; }
+  .gaps-table tbody tr:last-child { border-bottom: none; }
+  .gaps-table tbody tr:hover { background: rgba(139,155,145,0.05); }
+  .gaps-table td { padding: 12px 16px; font-size: 13px; color: var(--black); vertical-align: middle; }
+  .gap-nights-pill { display: inline-flex; align-items: center; justify-content: center; background: var(--dark-green); color: var(--off-white); border-radius: 3px; font-size: 12px; font-weight: bold; padding: 3px 10px; min-width: 40px; }
+  .gap-nights-pill.urgent   { background: var(--dark-red); }
+  .gap-nights-pill.moderate { background: #8a7030; }
+  .gap-nights-pill.notice   { background: var(--forest-green); }
+  .gap-prop-tag { font-size: 10px; color: var(--light-green); margin-top: 2px; }
+  .gap-rec { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 3px; display: inline-block; }
+  .gap-rec.urgent   { background: rgba(149,61,34,0.1); color: var(--dark-red); }
+  .gap-rec.moderate { background: rgba(216,210,148,0.25); color: #7a6000; }
+  .gap-rec.notice   { background: rgba(80,105,89,0.1); color: var(--forest-green); }
 
   /* Calendar */
   .calendars-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 24px; }
@@ -1972,8 +1964,6 @@
     <div class="section-header">
       <div class="section-label">Portfolio Summary</div>
       <div class="section-line"></div>
-      <div class="section-count">Both properties combined · QuickBooks</div>
-      <div class="source-pill qbo" style="font-size:9px;">QuickBooks</div>
     </div>
     <div class="metrics-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));">
       <div class="metric-card">
@@ -1981,22 +1971,26 @@
         <div class="metric-value" id="combined-rev-mtd">$—</div>
         <div class="metric-sub" id="combined-rev-mtd-month">Both properties</div>
         <div class="yoy" id="combined-rev-mtd-yoy" style="margin-top:8px;"></div>
+        <div class="source-pill qbo" style="margin-top:6px;">QuickBooks</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Revenue — Full Year</div>
         <div class="metric-value" id="combined-rev-ytd">$—</div>
         <div class="metric-sub">Jan 1 – Dec 31, 2026</div>
         <div class="yoy" id="combined-rev-ytd-yoy" style="margin-top:8px;"></div>
+        <div class="source-pill qbo" style="margin-top:6px;">QuickBooks</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Net After Commissions</div>
         <div class="metric-value" id="combined-net-mtd">$—</div>
         <div class="metric-sub">Full month · After platform fees</div>
+        <div class="source-pill qbo" style="margin-top:6px;">QuickBooks</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Goal Progress</div>
         <div class="metric-value" id="combined-goal-pct">—%</div>
         <div class="metric-sub" id="combined-goal-sub">of $836,222 combined goal</div>
+        <div class="source-pill qbo" style="margin-top:6px;">QuickBooks</div>
       </div>
     </div>
   </div>
@@ -2006,41 +2000,40 @@
     <div class="section-header">
       <div class="section-label">Current Month — <span id="kpi-month-label" style="font-style:normal;text-transform:none;letter-spacing:0">April 2026</span></div>
       <div class="section-line"></div>
-      <div class="section-count">Per property · Full month incl. forward bookings · QuickBooks</div>
     </div>
 
     <div class="prop-columns">
 
       <!-- SUMMIT -->
       <div class="prop-col">
-        <div class="prop-col-header forest">
+        <div class="prop-col-header" style="background:var(--light-green)">
           <div class="prop-col-dot" style="background:rgba(255,255,255,0.6)"></div>
           <div class="prop-col-name">Sisters' Summit</div>
           <div class="prop-col-addr">1402 2nd Ave</div>
         </div>
         <div class="prop-kpi-grid">
           <div class="prop-kpi-card">
-            <div class="prop-kpi-label">Revenue — Full Month</div>
+            <div class="prop-kpi-label">Revenue (Month)</div>
             <div class="prop-kpi-value" id="s-rev-mtd">$—</div>
-            <div class="prop-kpi-sub">Gross incl. cleaning fee</div>
+            <div class="prop-kpi-sub">Full month incl. forward bookings</div>
             <div class="yoy" id="s-rev-mtd-yoy"></div>
             <div class="source-pill qbo">QuickBooks</div>
           </div>
           <div class="prop-kpi-card">
-            <div class="prop-kpi-label">Revenue YTD</div>
+            <div class="prop-kpi-label">Revenue (Year)</div>
             <div class="prop-kpi-value" id="s-rev-ytd">$—</div>
-            <div class="prop-kpi-sub">Jan 1 to end of current month</div>
+            <div class="prop-kpi-sub">Jan 1 – Dec 31, booked revenue</div>
             <div class="yoy" id="s-rev-ytd-yoy"></div>
             <div class="source-pill qbo">QuickBooks</div>
           </div>
           <div class="prop-kpi-card">
-            <div class="prop-kpi-label">Net After Commissions</div>
+            <div class="prop-kpi-label">Gross Revenue</div>
             <div class="prop-kpi-value" id="s-net-mtd">$—</div>
-            <div class="prop-kpi-sub">Full month after platform fees</div>
+            <div class="prop-kpi-sub">After channel commissions</div>
             <div class="source-pill qbo">QuickBooks</div>
           </div>
           <div class="prop-kpi-card">
-            <div class="prop-kpi-label">Occupancy This Month</div>
+            <div class="prop-kpi-label">Occupancy</div>
             <div class="prop-kpi-value" id="s-occ-month">—%</div>
             <div class="prop-kpi-sub" id="s-occ-month-sub">— of — nights</div>
             <div class="source-pill hospitable">Hospitable</div>
@@ -2057,27 +2050,27 @@
         </div>
         <div class="prop-kpi-grid">
           <div class="prop-kpi-card">
-            <div class="prop-kpi-label">Revenue — Full Month</div>
+            <div class="prop-kpi-label">Revenue (Month)</div>
             <div class="prop-kpi-value" id="sol-rev-mtd">$—</div>
-            <div class="prop-kpi-sub">Gross incl. cleaning fee</div>
+            <div class="prop-kpi-sub">Full month incl. forward bookings</div>
             <div class="yoy" id="sol-rev-mtd-yoy"></div>
             <div class="source-pill qbo">QuickBooks</div>
           </div>
           <div class="prop-kpi-card">
-            <div class="prop-kpi-label">Revenue YTD</div>
+            <div class="prop-kpi-label">Revenue (Year)</div>
             <div class="prop-kpi-value" id="sol-rev-ytd">$—</div>
-            <div class="prop-kpi-sub">Jan 1 to end of current month</div>
+            <div class="prop-kpi-sub">Jan 1 – Dec 31, booked revenue</div>
             <div class="yoy" id="sol-rev-ytd-yoy"></div>
             <div class="source-pill qbo">QuickBooks</div>
           </div>
           <div class="prop-kpi-card">
-            <div class="prop-kpi-label">Net After Commissions</div>
+            <div class="prop-kpi-label">Gross Revenue</div>
             <div class="prop-kpi-value" id="sol-net-mtd">$—</div>
-            <div class="prop-kpi-sub">Full month after platform fees</div>
+            <div class="prop-kpi-sub">After channel commissions</div>
             <div class="source-pill qbo">QuickBooks</div>
           </div>
           <div class="prop-kpi-card">
-            <div class="prop-kpi-label">Occupancy This Month</div>
+            <div class="prop-kpi-label">Occupancy</div>
             <div class="prop-kpi-value" id="sol-occ-month">—%</div>
             <div class="prop-kpi-sub" id="sol-occ-month-sub">— of — nights</div>
             <div class="source-pill hospitable">Hospitable</div>
@@ -2093,14 +2086,13 @@
     <div class="section-header">
       <div class="section-label">Annual Goal Tracker</div>
       <div class="section-line"></div>
-      <div class="section-count" id="goal-year-label">2026 targets</div>
       <div class="source-pill qbo" style="font-size:9px;">QuickBooks</div>
     </div>
     <div class="prop-columns">
 
       <!-- SUMMIT GOAL -->
       <div class="prop-col">
-        <div class="prop-col-header blue">
+        <div class="prop-col-header" style="background:var(--sky-blue)">
           <div class="prop-col-dot" style="background:rgba(255,255,255,0.6)"></div>
           <div class="prop-col-name">Sisters' Summit</div>
           <div class="prop-col-addr">Goal: $453,633</div>
@@ -2117,7 +2109,7 @@
             </div>
           </div>
           <div style="height:10px;background:rgba(139,155,145,0.15);border-radius:5px;overflow:hidden;margin-bottom:10px;">
-            <div id="s-goal-bar" style="height:100%;border-radius:5px;width:0%;background:linear-gradient(90deg,var(--dark-green),var(--forest-green));transition:width 0.8s ease;"></div>
+            <div id="s-goal-bar" style="height:100%;border-radius:5px;width:0%;background:linear-gradient(90deg,var(--dark-blue),var(--sky-blue));transition:width 0.8s ease;"></div>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--light-green);">
             <span id="s-goal-remaining">$— remaining</span>
@@ -2128,7 +2120,7 @@
 
       <!-- SOLSTICE GOAL -->
       <div class="prop-col">
-        <div class="prop-col-header sky">
+        <div class="prop-col-header" style="background:var(--sky-blue)">
           <div class="prop-col-dot" style="background:rgba(255,255,255,0.6)"></div>
           <div class="prop-col-name">Sisters' Solstice</div>
           <div class="prop-col-addr">Goal: $382,589</div>
@@ -2145,7 +2137,7 @@
             </div>
           </div>
           <div style="height:10px;background:rgba(139,155,145,0.15);border-radius:5px;overflow:hidden;margin-bottom:10px;">
-            <div id="sol-goal-bar" style="height:100%;border-radius:5px;width:0%;background:linear-gradient(90deg,var(--forest-green),var(--light-green));transition:width 0.8s ease;"></div>
+            <div id="sol-goal-bar" style="height:100%;border-radius:5px;width:0%;background:linear-gradient(90deg,var(--sky-blue),var(--light-blue));transition:width 0.8s ease;"></div>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--light-green);">
             <span id="sol-goal-remaining">$— remaining</span>
@@ -2162,14 +2154,13 @@
     <div class="section-header">
       <div class="section-label">Untapped Revenue Potential</div>
       <div class="section-line"></div>
-      <div class="section-count">Open nights remaining · EOY</div>
       <div class="source-pill hospitable" style="font-size:9px;">Hospitable</div>
     </div>
     <div class="prop-columns">
 
       <!-- SUMMIT UNTAPPED -->
       <div class="prop-col">
-        <div class="prop-col-header red">
+        <div class="prop-col-header" style="background:var(--light-red)">
           <div class="prop-col-dot" style="background:rgba(255,255,255,0.6)"></div>
           <div class="prop-col-name">Sisters' Summit</div>
           <div class="prop-col-addr">At current PriceLabs rates</div>
@@ -2184,7 +2175,7 @@
               <div style="font-size:10px;color:var(--light-green);margin-top:2px;">remaining this year</div>
             </div>
             <div style="flex:1;background:rgba(139,155,145,0.08);border-radius:4px;padding:14px;">
-              <div style="font-size:10px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:var(--light-green);margin-bottom:6px;">Gross Potential Revenue</div>
+              <div style="font-size:10px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:var(--light-green);margin-bottom:6px;">Potential Revenue</div>
               <div style="font-size:26px;font-weight:bold;color:var(--dark-green);letter-spacing:-0.02em;" id="s-open-revenue">$—</div>
               <div style="font-size:10px;color:var(--light-green);margin-top:2px;">at current nightly rates</div>
             </div>
@@ -2196,7 +2187,7 @@
             <span id="s-need-pct" style="font-weight:bold;color:var(--forest-green);">—%</span>
           </div>
           <div style="height:8px;background:rgba(139,155,145,0.15);border-radius:4px;overflow:hidden;margin-bottom:8px;">
-            <div id="s-need-bar" style="height:100%;border-radius:4px;width:0%;background:linear-gradient(90deg,var(--yellow),#c8ba7a);transition:width 0.8s ease;"></div>
+            <div id="s-need-bar" style="height:100%;border-radius:4px;width:0%;background:linear-gradient(90deg,var(--dark-red),var(--light-red));transition:width 0.8s ease;"></div>
           </div>
           <div style="font-size:11px;color:var(--light-green);" id="s-need-label">Calculating...</div>
 
@@ -2219,7 +2210,7 @@
               <div style="font-size:10px;color:var(--light-green);margin-top:2px;">remaining this year</div>
             </div>
             <div style="flex:1;background:rgba(139,155,145,0.08);border-radius:4px;padding:14px;">
-              <div style="font-size:10px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:var(--light-green);margin-bottom:6px;">Gross Potential Revenue</div>
+              <div style="font-size:10px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:var(--light-green);margin-bottom:6px;">Potential Revenue</div>
               <div style="font-size:26px;font-weight:bold;color:var(--dark-green);letter-spacing:-0.02em;" id="sol-open-revenue">$—</div>
               <div style="font-size:10px;color:var(--light-green);margin-top:2px;">at current nightly rates</div>
             </div>
@@ -2230,7 +2221,7 @@
             <span id="sol-need-pct" style="font-weight:bold;color:var(--forest-green);">—%</span>
           </div>
           <div style="height:8px;background:rgba(139,155,145,0.15);border-radius:4px;overflow:hidden;margin-bottom:8px;">
-            <div id="sol-need-bar" style="height:100%;border-radius:4px;width:0%;background:linear-gradient(90deg,var(--yellow),#c8ba7a);transition:width 0.8s ease;"></div>
+            <div id="sol-need-bar" style="height:100%;border-radius:4px;width:0%;background:linear-gradient(90deg,var(--dark-red),var(--light-red));transition:width 0.8s ease;"></div>
           </div>
           <div style="font-size:11px;color:var(--light-green);" id="sol-need-label">Calculating...</div>
 
@@ -2243,23 +2234,22 @@
     <div class="section-header">
       <div class="section-label">Annual Revenue</div>
       <div class="section-line"></div>
-      <div class="section-count" id="rev-chart-year">2026 · Gross top-line</div>
       <div class="source-pill qbo" style="font-size:9px;">QuickBooks</div>
     </div>
-    <div class="grid-surface token-panel">
+    <div style="background:#EFEFED;border-radius:4px;padding:28px;box-shadow:0 1px 3px rgba(55,70,61,0.07);">
       <div class="token-panel-inner">
         <div class="token-header">
           <div class="token-header-left">
-            <h3>Monthly Revenue — Both Properties</h3>
-            <p>Gross revenue per month · Cleaning fees included · From QuickBooks</p>
+            <h3 style="color:var(--dark-green);">Monthly Revenue — Both Properties</h3>
+            <p style="color:var(--light-green);">Gross revenue per month · Cleaning fees included · From QuickBooks</p>
           </div>
           <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.5);">
-              <div style="width:12px;height:2px;background:rgba(255,255,255,0.8);border-radius:1px"></div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--forest-green);">
+              <div style="width:12px;height:2px;background:var(--forest-green);border-radius:1px"></div>
               Summit
             </div>
-            <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.5);">
-              <div style="width:12px;height:2px;background:var(--yellow);border-radius:1px"></div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dark-blue);">
+              <div style="width:12px;height:2px;background:var(--dark-blue);border-radius:1px"></div>
               Solstice
             </div>
           </div>
@@ -2267,20 +2257,20 @@
         <div style="position:relative;height:160px;width:100%;overflow:hidden;">
           <canvas id="rev-chart" style="width:100%;height:160px;display:block;"></canvas>
         </div>
-        <div id="rev-chart-tooltip" style="position:fixed;display:none;background:rgba(30,40,35,0.95);border:1px solid rgba(255,255,255,0.15);padding:8px 12px;border-radius:4px;font-size:11px;color:rgba(255,255,255,0.9);pointer-events:none;z-index:99;line-height:1.8;"></div>
+        <div id="rev-chart-tooltip" style="position:fixed;display:none;background:rgba(30,40,35,0.92);border:1px solid rgba(55,70,61,0.2);padding:8px 12px;border-radius:4px;font-size:11px;color:rgba(255,255,255,0.9);pointer-events:none;z-index:99;line-height:1.8;"></div>
         <!-- Combined totals strip -->
-        <div style="display:flex;gap:24px;flex-wrap:wrap;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);margin-top:20px;">
+        <div style="display:flex;gap:24px;flex-wrap:wrap;padding-top:20px;border-top:1px solid rgba(55,70,61,0.1);margin-top:20px;">
           <div>
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.35);margin-bottom:4px;">Combined YTD</div>
-            <div style="font-size:20px;font-weight:bold;color:rgba(255,255,255,0.9);" id="rev-combined-ytd">$—</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--light-green);margin-bottom:4px;">Combined YTD</div>
+            <div style="font-size:20px;font-weight:bold;color:var(--dark-green);" id="rev-combined-ytd">$—</div>
           </div>
           <div>
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.35);margin-bottom:4px;">Best Month</div>
-            <div style="font-size:20px;font-weight:bold;color:rgba(255,255,255,0.9);" id="rev-best-month">—</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--light-green);margin-bottom:4px;">Best Month</div>
+            <div style="font-size:20px;font-weight:bold;color:var(--dark-green);" id="rev-best-month">—</div>
           </div>
           <div>
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.35);margin-bottom:4px;">Monthly Avg</div>
-            <div style="font-size:20px;font-weight:bold;color:rgba(255,255,255,0.9);" id="rev-avg-month">$—</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--light-green);margin-bottom:4px;">Monthly Avg</div>
+            <div style="font-size:20px;font-weight:bold;color:var(--dark-green);" id="rev-avg-month">$—</div>
           </div>
         </div>
       </div>
@@ -2292,7 +2282,6 @@
     <div class="section-header">
       <div class="section-label">Occupancy Forecast</div>
       <div class="section-line"></div>
-      <div class="section-count">Next 30 · 60 · 90 nights</div>
       <div class="source-pill hospitable" style="font-size:9px;">Hospitable</div>
     </div>
     <div class="occ-grid" id="occ-grid">
@@ -2339,16 +2328,11 @@
   <!-- BOOKING GAPS -->
   <div class="section" id="sec-gaps">
     <div class="section-header">
-      <div class="section-label">Booking Gaps</div>
+      <div class="section-label">Booking Gaps (90 Days)</div>
       <div class="section-line"></div>
-      <div class="section-count" id="gaps-count">Upcoming open stretches</div>
       <div class="source-pill hospitable" style="font-size:9px;">Hospitable</div>
     </div>
-    <div class="gaps-list" id="gaps-list">
-      <div style="padding:24px;text-align:center;color:var(--light-grey);font-size:13px;border:1px solid var(--border);border-radius:4px;">
-        Loading gap data from snapshot...
-      </div>
-    </div>
+    <div id="gaps-list"></div>
   </div>
 
   <!-- CALENDARS -->
@@ -2356,7 +2340,6 @@
     <div class="section-header">
       <div class="section-label">Availability Calendars</div>
       <div class="section-line"></div>
-      <div class="section-count">12-month view per property</div>
       <div class="source-pill hospitable" style="font-size:9px;">Hospitable</div>
     </div>
     <div class="calendars-grid">
@@ -2637,27 +2620,30 @@
     const step = cW / 11; // 12 months, 11 gaps
 
     // Y grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(55,70,61,0.08)'; ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
       const y = pad.top + (cH / 4) * i;
       ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cW, y); ctx.stroke();
       const val = maxVal - (maxVal / 4) * i;
-      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.fillStyle = 'rgba(55,70,61,0.45)';
       ctx.font = '9px Arial'; ctx.textAlign = 'right';
       const label = val >= 1000 ? '$' + (val/1000).toFixed(0) + 'k' : '$' + val.toFixed(0);
       ctx.fillText(label, pad.left - 5, y + 3);
     }
 
-    // Month labels on x axis
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    // Month labels on x axis — skip labels on mobile to prevent overlap
+    ctx.fillStyle = 'rgba(55,70,61,0.4)';
     ctx.font = '9px Arial'; ctx.textAlign = 'center';
+    const showEvery = W < 400 ? 3 : W < 600 ? 2 : 1;
     MONTHS.forEach((m, i) => {
-      ctx.fillText(m, pad.left + step * i, H - 6);
+      if (i % showEvery !== 0) return;
+      const label = W < 400 ? m.slice(0,1) : m;
+      ctx.fillText(label, pad.left + step * i, H - 6);
     });
 
     // Current month marker
     const cx = pad.left + step * currentMonth;
-    ctx.strokeStyle = 'rgba(216,210,148,0.2)';
+    ctx.strokeStyle = 'rgba(55,70,61,0.15)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3,3]);
     ctx.beginPath(); ctx.moveTo(cx, pad.top); ctx.lineTo(cx, pad.top + cH); ctx.stroke();
@@ -2705,8 +2691,8 @@
       return pts;
     }
 
-    const sPts = drawLine(s, 'rgba(255,255,255,0.85)');
-    const solPts = drawLine(sol, 'rgba(216,210,148,0.9)');
+    const sPts = drawLine(s, '#506959');
+    const solPts = drawLine(sol, '#265D96');
 
     // Tooltip
     canvas.onmousemove = (e) => {
@@ -2913,9 +2899,9 @@
             if (!capturable) {
               elBar.style.background = 'linear-gradient(90deg, var(--dark-red), var(--light-red))';
             } else if (rawPct > 75) {
-              elBar.style.background = 'linear-gradient(90deg, #c8a030, var(--yellow))';
+              elBar.style.background = 'linear-gradient(90deg, var(--dark-red), var(--light-red))';
             } else {
-              elBar.style.background = 'linear-gradient(90deg, var(--forest-green), var(--light-green))';
+              elBar.style.background = 'linear-gradient(90deg, var(--light-red), #d4937f)';
             }
           }, 150);
         }
@@ -3031,23 +3017,40 @@
     const allGaps = [...summitGaps, ...solsticeGaps].sort((a,b) => a.start.localeCompare(b.start));
 
     const gapsList = document.getElementById('gaps-list');
-    const gapsCount = document.getElementById('gaps-count');
     if (allGaps.length === 0) {
-      gapsList.innerHTML = '<div style="padding:24px;text-align:center;color:var(--light-grey);font-size:13px;border:1px solid var(--border);border-radius:4px;">No gaps of 2+ nights in the next 90 days.</div>';
-      gapsCount.textContent = 'No gaps detected (90 days)';
+      gapsList.innerHTML = '<div style="padding:24px;text-align:center;color:var(--light-grey);font-size:13px;background:var(--white);border-radius:4px;box-shadow:0 1px 3px rgba(55,70,61,0.07);">No gaps of 2+ nights in the next 90 days.</div>';
     } else {
-      gapsCount.textContent = allGaps.length + ' gap' + (allGaps.length !== 1 ? 's' : '') + ' in next 90 days';
-      gapsList.innerHTML = allGaps.map(g => {
-        const cls = g.nights >= 7 ? 'urgent' : g.nights >= 4 ? 'moderate' : 'notice';
-        return `<div class="gap-item ${cls}">
-          <div class="gap-nights-badge">${g.nights}<span>nts</span></div>
-          <div class="gap-info">
-            <div class="gap-dates">${fmtGapDate(g.start)} – ${fmtGapDate(g.end)}</div>
-            <div class="gap-property">${g.property}</div>
-          </div>
-          <div class="gap-action">${g.nights >= 7 ? 'Price drop' : g.nights >= 4 ? 'Review pricing' : 'Monitor'}</div>
-        </div>`;
-      }).join('');
+      const recLabel = (nights) => {
+        if (nights >= 7) return { cls: 'urgent',   text: 'Price drop — fill urgently' };
+        if (nights >= 4) return { cls: 'moderate', text: 'Review pricing & min stay' };
+        return                  { cls: 'notice',   text: 'Monitor — short gap' };
+      };
+      const potLabel = (nights) => '$' + (nights * 500).toLocaleString() + ' potential';
+
+      gapsList.innerHTML = `
+        <table class="gaps-table">
+          <thead>
+            <tr>
+              <th>Nights</th>
+              <th>Dates</th>
+              <th>Property</th>
+              <th>Est. Potential</th>
+              <th>Recommended Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${allGaps.map(g => {
+              const rec = recLabel(g.nights);
+              return `<tr>
+                <td><span class="gap-nights-pill ${rec.cls}">${g.nights}n</span></td>
+                <td><strong>${fmtGapDate(g.start)}</strong> – ${fmtGapDate(g.end)}</td>
+                <td>${g.property}</td>
+                <td style="color:var(--forest-green);font-weight:bold;">${potLabel(g.nights)}</td>
+                <td><span class="gap-rec ${rec.cls}">${rec.text}</span></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
     }
 
     // ── Calendars ──
