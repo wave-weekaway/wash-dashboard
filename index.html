@@ -1524,7 +1524,7 @@
           <div style="font-size:18px;flex-shrink:0;">🌐</div>
           <div>
             <div style="font-size:12px;font-weight:bold;color:var(--dark-green);margin-bottom:2px;">Google Workspace</div>
-            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">Gmail, Calendar, Drive via philip@weekaway.com</div>
+            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">Gmail, Calendar, Drive via <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b1c1d9d8ddd8c1f1c6d4d4dad0c6d0c89fd2dedc">[email&#160;protected]</a></div>
             <div style="font-size:9px;color:var(--light-green);margin-top:4px;font-weight:bold;letter-spacing:0.06em;">gog CLI · OAuth2</div>
           </div>
         </div>
@@ -1650,7 +1650,7 @@
             <td>Google Workspace</td>
             <td style="font-size:12px;color:var(--dark-grey)">Email, calendar, drive access</td>
             <td>
-              <div class="api-endpoint">gog CLI · philip@weekaway.com</div>
+              <div class="api-endpoint">gog CLI · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d6a6bebfbabfa696a1b3b3bdb7a1b7aff8b5b9bb">[email&#160;protected]</a></div>
               <div class="api-endpoint">Gmail + Calendar + Drive</div>
               <div class="api-endpoint">#wave-gworkspace channel</div>
             </td>
@@ -1913,7 +1913,7 @@
           <div class="feature-card-title">Google Workspace Access</div>
           <div class="tag live"><div class="tag-dot"></div>Live</div>
         </div>
-        <div class="feature-card-desc">WAVE can read and send Gmail, access Google Calendar, and retrieve Drive documents via the gog CLI on the Mac Mini. Connected to philip@weekaway.com.</div>
+        <div class="feature-card-desc">WAVE can read and send Gmail, access Google Calendar, and retrieve Drive documents via the gog CLI on the Mac Mini. Connected to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dbabb3b2b7b2ab9bacbebeb0baacbaa2f5b8b4b6">[email&#160;protected]</a>.</div>
         <div class="feature-tags">
           <span class="feature-tag">Gmail</span>
           <span class="feature-tag">Calendar</span>
@@ -2722,7 +2722,7 @@
 </div>
 </div><!-- end page-ops -->
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // ══════════════════════════════════════════
   //  NAVIGATION
   // ══════════════════════════════════════════
@@ -2786,10 +2786,12 @@
   //  LINE CHART (WAVE System page)
   // ══════════════════════════════════════════
   function drawChart(dailyData) {
+    window._lastCostData = dailyData;
     const canvas = document.getElementById('cost-chart');
     if (!canvas) return;
     const dpr = window.devicePixelRatio || 1;
-    const W = canvas.offsetWidth;
+    const W = canvas.parentElement ? canvas.parentElement.offsetWidth : canvas.offsetWidth;
+    if (!W || W < 10) return; // canvas not visible, will draw when page is switched to
     const H = 120;
     canvas.width = W * dpr; canvas.height = H * dpr;
     canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
@@ -2967,51 +2969,56 @@
     label.textContent  = isOpen ? 'Monthly breakdown' : 'Hide breakdown';
   }
 
-  function buildMonthlyBreakdown(tbodyId, bookedDates) {
+  function buildMonthlyBreakdown(tbodyId, bookedDates, byMonth) {
     const tbody = document.getElementById(tbodyId);
     if (!tbody) return;
 
     const now       = new Date();
     const thisYear  = now.getFullYear();
-    const thisMonth = now.getMonth(); // 0-indexed
+    const thisMonth = now.getMonth();
     const MONTHS    = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
     const bookedSet = new Set(bookedDates || []);
     const rows = [];
 
     for (let m = thisMonth; m < 12; m++) {
       const daysInMonth = new Date(thisYear, m + 1, 0).getDate();
-      let openNights = 0;
+      let openNights, openRevenue;
 
-      for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = thisYear + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-        // Only count future open nights
-        if (dateStr >= now.toISOString().slice(0,10) && !bookedSet.has(dateStr)) {
-          openNights++;
+      if (byMonth && byMonth[m] && byMonth[m].open_nights > 0) {
+        openNights  = byMonth[m].open_nights;
+        openRevenue = byMonth[m].open_revenue;
+      } else {
+        openNights = 0;
+        for (let d = 1; d <= daysInMonth; d++) {
+          const ds = thisYear + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          if (ds >= now.toISOString().slice(0,10) && !bookedSet.has(ds)) openNights++;
         }
+        openRevenue = null;
       }
 
       const bookedNights = daysInMonth - openNights;
-      const occPct = Math.round((bookedNights / daysInMonth) * 100);
-
-      // Colour code availability dot
+      const occPct   = Math.round((bookedNights / daysInMonth) * 100);
       const dotColor = occPct >= 70 ? '#2d7a30' : occPct >= 40 ? '#8a7030' : 'var(--dark-red)';
       const occLabel = occPct >= 70 ? 'Well booked' : occPct >= 40 ? 'Filling up' : 'Open';
 
-      // Rough revenue estimate at ~$600/night average for open nights
-      const potRev = openNights * 600;
+      const revDisplay = openRevenue !== null
+        ? '$' + Math.round(openRevenue).toLocaleString()
+        : openNights > 0 ? '~$' + (openNights * 600).toLocaleString() : '—';
+
+      const avgNightly = openNights > 0 && openRevenue
+        ? ' <span style="font-size:10px;color:var(--light-green);">$' + Math.round(openRevenue / openNights).toLocaleString() + '/nt avg</span>'
+        : '';
 
       rows.push(`<tr>
         <td style="font-weight:bold;">${MONTHS[m]}</td>
         <td class="col-nights-val">${openNights > 0 ? openNights + ' nights' : '—'}</td>
-        <td style="color:var(--dark-red);font-weight:bold;">${openNights > 0 ? '$' + potRev.toLocaleString() : '—'}</td>
+        <td style="color:var(--dark-red);font-weight:bold;">${revDisplay}${avgNightly}</td>
         <td class="col-avail">
-          <span class="occ-dot" style="background:${dotColor};"></span>
+          <span class="occ-dot" style="background:${dotColor};vertical-align:middle;"></span>
           <span style="font-size:11px;color:var(--dark-grey);">${occLabel} · ${occPct}%</span>
         </td>
       </tr>`);
     }
-
     tbody.innerHTML = rows.join('');
   }
   // ══════════════════════════════════════════
@@ -3363,8 +3370,10 @@
     );
 
     // Build monthly breakdown tables (pre-rendered, shown on expand)
-    buildMonthlyBreakdown('s-monthly-breakdown', summitDates);
-    buildMonthlyBreakdown('sol-monthly-breakdown', solsticeDates);
+    const sByMonth   = cal.summit_open   ? cal.summit_open.by_month   : null;
+    const solByMonth = cal.solstice_open ? cal.solstice_open.by_month : null;
+    buildMonthlyBreakdown('s-monthly-breakdown',   summitDates,   sByMonth);
+    buildMonthlyBreakdown('sol-monthly-breakdown', solsticeDates, solByMonth);
     function calcOcc(dates, days) {
       const today = new Date();
       const bookedSet = new Set(dates);
@@ -3514,7 +3523,7 @@
   //  SNAPSHOT LOADER
   // ══════════════════════════════════════════
   const SNAPSHOT_URL = 'https://raw.githubusercontent.com/wave-weekaway/wash-dashboard/main/wave-snapshot.json';
-  const MARCH_FALLBACK = {"2026-03-01":0,"2026-03-02":0,"2026-03-03":0,"2026-03-04":0,"2026-03-05":0,"2026-03-06":0,"2026-03-07":0,"2026-03-08":0,"2026-03-09":0,"2026-03-10":0,"2026-03-11":0,"2026-03-12":0,"2026-03-13":0,"2026-03-14":0.22,"2026-03-15":0.11,"2026-03-16":0.10,"2026-03-17":0,"2026-03-18":0.06,"2026-03-19":0.33,"2026-03-20":5.71,"2026-03-21":1.44,"2026-03-22":0.37,"2026-03-23":5.79,"2026-03-24":0.32,"2026-03-25":0.30,"2026-03-26":1.59,"2026-03-27":5.92,"2026-03-28":15.46};
+  // No fallback chart data — only render from live snapshot
 
   async function loadSnapshot() {
     try {
@@ -3546,14 +3555,21 @@
           const pct = ((cost / limit) * 100).toFixed(1);
           document.getElementById('token-cost').textContent = fmt$(cost);
           document.getElementById('token-remaining').textContent = fmt$(limit - cost);
-          document.getElementById('token-bar-pct').textContent = pct + '% used · resets Apr 1';
+          const nextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toLocaleDateString('en-US', {month:'short', day:'numeric'}); document.getElementById('token-bar-pct').textContent = pct + '% used · resets ' + nextMonth;
           document.getElementById('token-bar-fill').style.width = pct + '%';
           const barFill = document.getElementById('token-bar-fill');
           if (parseFloat(pct) > 80 && barFill) barFill.classList.add('warn');
         }
         if (t.month) document.getElementById('token-month').textContent = t.month;
         if (t.period) document.getElementById('token-period').textContent = t.period;
-        if (t.daily_costs) drawChart(t.daily_costs);
+        if (t.daily_costs) {
+          window._lastCostData = t.daily_costs;
+          // Only draw if wave page is currently visible
+          const wavePage = document.getElementById('page-wave');
+          if (wavePage && wavePage.classList.contains('active')) {
+            drawChart(t.daily_costs);
+          }
+        }
       }
 
       // Re-render ops if page is visible
@@ -3565,7 +3581,6 @@
       document.getElementById('snapshot-note').textContent = 'Static placeholder data';
       const opsTs = document.getElementById('ops-snapshot-timestamp');
       if (opsTs) opsTs.textContent = 'Awaiting snapshot';
-      drawChart(MARCH_FALLBACK);
       // Seed empty ops data so calendars still render
       if (!window._opsData) window._opsData = {};
     }
@@ -3607,7 +3622,6 @@
   //  INIT
   // ══════════════════════════════════════════
   window.addEventListener('load', () => {
-    drawChart(MARCH_FALLBACK);
     loadSnapshot();
     renderOpsPage();
     initFadeUps('page-ops');
@@ -3623,9 +3637,12 @@
   window.switchPage = function(page) {
     _origSwitch(page);
     setTimeout(() => initFadeUps('page-' + page), 10);
+    if (page === 'wave' && window._lastCostData) {
+      setTimeout(() => drawChart(window._lastCostData), 50);
+    }
   };
 
-  // ── Back to top ──
+  // Back to top
   window.addEventListener('scroll', () => {
     const bttBtn = document.getElementById('back-to-top');
     if (!bttBtn) return;
