@@ -82,17 +82,47 @@
 
   /* ── HEADER ── */
   .header {
-    padding: 56px 0 48px;
-    margin-bottom: 48px;
+    padding: 56px 0 80px;
+    margin-bottom: 0;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
     position: relative;
-    border-radius: 4px;
-    overflow: hidden;
+    border-radius: 0;
+    overflow: visible;
   }
 
+  /* Fade background — dark green at top dissolving to transparent */
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(55,70,61,0.32) 0%,
+      rgba(55,70,61,0.18) 40%,
+      rgba(55,70,61,0.06) 72%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
 
-
-
-
+  .header-inner {
+    position: relative;
+    z-index: 1;
+    padding: 0 24px 0 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media (max-width: 768px) {
+    .header {
+      margin-left: -16px;
+      margin-right: -16px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .header-inner { padding: 0 24px 0 24px; }
+  }
   .header-inner {
     padding: 0 24px 0 28px;
   }
@@ -544,7 +574,39 @@
   .page { display: none; }
   .page.active { display: block; }
 
-  /* ── OPS SUBNAV ── */
+  /* ── WAVE AGENT PERSONALITIES ── */
+  .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .agent-card {
+    background: var(--white);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(55,70,61,0.07);
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .agent-card:hover { box-shadow: 0 4px 12px rgba(55,70,61,0.12); transform: translateY(-1px); }
+  .agent-card-header {
+    background: var(--dark-green);
+    padding: 16px;
+    text-align: center;
+  }
+  .agent-avatar {
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin: 0 auto 8px;
+  }
+  .agent-role { font-size: 10px; font-weight: bold; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 2px; }
+  .agent-title { font-size: 13px; font-weight: bold; color: rgba(255,255,255,0.95); }
+  .agent-channel { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 3px; }
+  .agent-body { padding: 16px; }
+  .agent-vp { font-size: 12px; color: var(--dark-grey); line-height: 1.6; margin-bottom: 12px; }
+  .agent-handles { display: flex; flex-direction: column; gap: 4px; }
+  .agent-handle-item { font-size: 10px; color: var(--light-green); display: flex; align-items: flex-start; gap: 5px; }
+  .agent-handle-item::before { content: '—'; color: var(--light-green); flex-shrink: 0; }
+
+  /* ── WAVE PAGE SUBNAV ── */
+  .wave-subnav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 40px; }
   .ops-subnav {
     display: flex;
     gap: 6px;
@@ -745,7 +807,47 @@
     .gaps-table td:first-child { margin-bottom: 4px; }
   }
 
-  /* Revenue chart mobile height */
+  /* Untapped monthly breakdown expand */
+  .untapped-expand {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+    opacity: 0;
+  }
+  .untapped-expand.open {
+    max-height: 600px;
+    opacity: 1;
+  }
+  .untapped-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    border-top: 1px solid rgba(149,61,34,0.15);
+    padding: 10px 20px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.06em;
+    color: var(--light-red);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+  .untapped-toggle:hover { background: rgba(149,61,34,0.04); }
+  .untapped-month-table { width: 100%; border-collapse: collapse; }
+  .untapped-month-table th { font-size: 9px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; color: var(--light-green); padding: 8px 20px; text-align: left; border-bottom: 1px solid rgba(139,155,145,0.15); background: rgba(139,155,145,0.05); }
+  .untapped-month-table td { font-size: 12px; padding: 9px 20px; border-bottom: 1px solid rgba(139,155,145,0.1); color: var(--black); }
+  .untapped-month-table tr:last-child td { border-bottom: none; }
+  .untapped-month-table tr:hover td { background: rgba(139,155,145,0.04); }
+  .untapped-month-table .col-avail { }
+  @media (max-width: 640px) {
+    .untapped-month-table .col-avail { display: none; }
+    .untapped-month-table th, .untapped-month-table td { padding: 9px 14px; }
+    .untapped-month-table .col-nights-val { font-size: 12px; }
+  }
+  .occ-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; flex-shrink: 0; vertical-align: middle; }
   @media (max-width: 600px) {
     #rev-chart { height: 220px !important; }
     #rev-chart-container { height: 220px !important; }
@@ -807,35 +909,42 @@
      PAGE-SCOPED THEMES
   ══════════════════════════════════════════ */
 
-  /* WAVE System page — blue accent */
-  #page-wave .section-label  { color: var(--dark-blue); }
-  #page-wave .section-line   { background: var(--sky-blue); opacity: 0.3; }
-  #page-wave .section-count  { color: var(--sky-blue); }
-  #page-wave .metric-card::before { background: var(--dark-blue); }
-  #page-wave .metric-label   { color: var(--sky-blue); }
-  #page-wave .metric-value   { color: var(--dark-blue); }
-  #page-wave .snapshot-banner strong { color: var(--dark-blue); }
-  #page-wave .snapshot-note  { color: var(--sky-blue); }
-  #page-wave .changelog-version-num  { color: var(--dark-blue); }
-  #page-wave .changelog-version-date { color: var(--sky-blue); }
-  #page-wave .changelog-chevron      { color: var(--sky-blue); }
-  #page-wave .changelog-bullet       { background: var(--sky-blue); }
-  #page-wave .changelog-items        { background: rgba(38,93,150,0.03); }
-  #page-wave .changelog-version      { border-bottom: 1px solid rgba(38,93,150,0.12); }
-  #page-wave .changelog              { border: 1px solid rgba(38,93,150,0.2); }
-  #page-wave .feature-card-footer    { border-top: 1px solid rgba(38,93,150,0.1); }
-  #page-wave .feature-card-meta      { color: var(--sky-blue); }
-  #page-wave .feature-tag            { color: var(--dark-blue); background: rgba(38,93,150,0.07); border-color: rgba(38,93,150,0.15); }
-  #page-wave .ornament               { color: var(--sky-blue); opacity: 0.5; }
+  /* WAVE System page — green accent (matching ops page) */
+  #page-wave .section-label  { color: var(--forest-green); }
+  #page-wave .section-line   { background: var(--light-green); opacity: 0.4; }
+  #page-wave .section-count  { color: var(--light-green); }
+  #page-wave .metric-card::before { background: var(--yellow); }
+  #page-wave .metric-label   { color: var(--light-green); }
+  #page-wave .metric-value   { color: var(--dark-green); }
+  #page-wave .snapshot-banner strong { color: var(--forest-green); }
+  #page-wave .snapshot-note  { color: var(--light-green); }
+  #page-wave .changelog-version-num  { color: var(--forest-green); }
+  #page-wave .changelog-version-date { color: var(--light-green); }
+  #page-wave .changelog-chevron      { color: var(--light-green); }
+  #page-wave .changelog-bullet       { background: var(--light-green); }
+  #page-wave .changelog-items        { background: rgba(139,155,145,0.05); }
+  #page-wave .changelog-version      { border-bottom: 1px solid rgba(139,155,145,0.15); }
+  #page-wave .changelog              { border: 1px solid rgba(139,155,145,0.25); }
+  #page-wave .feature-card-footer    { border-top: 1px solid rgba(139,155,145,0.15); }
+  #page-wave .feature-card-meta      { color: var(--light-green); }
+  #page-wave .feature-tag            { color: var(--forest-green); background: rgba(80,105,89,0.08); border-color: rgba(139,155,145,0.25); }
+  #page-wave .ornament               { color: var(--light-green); opacity: 0.5; }
   #page-wave .ornament::before,
-  #page-wave .ornament::after        { background: rgba(38,93,150,0.2); }
-  #page-wave .footer-brand           { color: var(--sky-blue); }
-  #page-wave .footer-brand strong    { color: var(--dark-blue); }
-  #page-wave .header-eyebrow         { color: var(--dark-blue); }
-  #page-wave .header-divider         { background: var(--dark-blue); }
-  #page-wave .version-pill           { background: var(--dark-blue); }
-  #page-wave .api-table th           { background: var(--dark-blue); }
-  #page-wave .roadmap-card:hover     { box-shadow: 0 4px 12px rgba(38,93,150,0.12); }
+  #page-wave .ornament::after        { background: rgba(139,155,145,0.25); }
+  #page-wave .footer-brand           { color: var(--light-green); }
+  #page-wave .footer-brand strong    { color: var(--forest-green); }
+  #page-wave .header-eyebrow         { color: var(--forest-green); }
+  #page-wave .header-divider         { background: var(--forest-green); }
+  #page-wave .version-pill           { background: var(--dark-green); }
+  #page-wave .api-table th           { background: var(--dark-green); }
+  #page-wave .roadmap-card:hover     { box-shadow: 0 4px 12px rgba(55,70,61,0.12); }
+
+  /* Health grid — green themed */
+  .health-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; background: rgba(139,155,145,0.2); border: 1px solid rgba(139,155,145,0.25); border-radius: 4px; overflow: hidden; }
+  .health-card:hover { background: rgba(139,155,145,0.06); }
+  .health-card-icon { width: 32px; height: 32px; border: 1px solid rgba(139,155,145,0.3); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .health-card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(139,155,145,0.15); }
+  .health-uptime strong { color: var(--forest-green); }
 
   /* Property Operations page — green accent */
   #page-ops .section-label   { color: var(--forest-green); }
@@ -844,6 +953,37 @@
   #page-ops .snapshot-banner strong { color: var(--forest-green); }
   #page-ops .footer-brand    { color: var(--light-green); }
   #page-ops .footer-brand strong { color: var(--forest-green); }
+
+  /* ── BACK TO TOP ── */
+  .back-to-top {
+    position: fixed;
+    bottom: 28px;
+    right: 24px;
+    width: 40px;
+    height: 40px;
+    background: var(--dark-green);
+    color: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(55,70,61,0.25);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 200;
+    pointer-events: none;
+    line-height: 1;
+  }
+  .back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .back-to-top:hover { background: var(--forest-green); }
 
   /* ══════════════════════════════════════════
      ANIMATIONS
@@ -982,70 +1122,96 @@
     <div class="snapshot-note" id="snapshot-note">Fetching live data...</div>
   </div>
 
-
+  <!-- WAVE SUBNAV -->
+  <div style="font-size:9px;font-weight:bold;letter-spacing:0.14em;text-transform:uppercase;color:var(--light-green);margin-bottom:8px;">Categories</div>
+  <nav class="wave-subnav">
+    <a class="ops-subnav-item" href="#sec-wave-api">API Usage</a>
+    <a class="ops-subnav-item" href="#sec-wave-health">System Health</a>
+    <a class="ops-subnav-item" href="#sec-wave-agents">WAVE Agents</a>
+    <a class="ops-subnav-item" href="#sec-wave-integrations">Integrations</a>
+    <a class="ops-subnav-item" href="#sec-wave-features">Features</a>
+    <a class="ops-subnav-item" href="#sec-wave-roadmap">Roadmap</a>
+    <a class="ops-subnav-item" href="#sec-wave-changelog">Changelog</a>
+  </nav>
 
   <!-- CLAUDE API USAGE -->
-  <div class="section">
+  <div class="section" id="sec-wave-api">
     <div class="section-header">
       <div class="section-label">Claude API Usage</div>
       <div class="section-line"></div>
       <div class="section-count" id="token-month">March 2026</div>
     </div>
-    <div class="grid-surface token-panel">
+    <div style="background:#EFEFED;border-radius:4px;padding:28px;box-shadow:0 1px 3px rgba(55,70,61,0.07);">
       <div class="token-panel-inner">
 
         <div class="token-header">
           <div class="token-header-left">
-            <h3>Anthropic Console — Live Data</h3>
-            <p>claude-sonnet-4-6 · WeekAway Inc. organization</p>
+            <h3 style="color:var(--dark-green);">Anthropic Console — Live Data</h3>
+            <p style="color:var(--light-green);">claude-sonnet-4-6 · WeekAway Inc. organization</p>
           </div>
-          <div class="token-period" id="token-period">Loading...</div>
+          <div class="token-period" id="token-period" style="background:rgba(55,70,61,0.08);border-color:rgba(55,70,61,0.12);color:var(--dark-grey);">Loading...</div>
         </div>
 
         <!-- Stat tiles -->
         <div class="token-stats">
-          <div class="token-stat">
-            <div class="token-stat-label">Tokens In</div>
-            <div class="token-stat-value" id="token-input">42.1M</div>
-            <div class="token-stat-sub">Input MTD</div>
+          <div class="token-stat" style="background:rgba(55,70,61,0.06);border-color:rgba(55,70,61,0.1);">
+            <div class="token-stat-label" style="color:var(--light-green);">Tokens In</div>
+            <div class="token-stat-value" style="color:var(--dark-green);" id="token-input">—</div>
+            <div class="token-stat-sub" style="color:var(--light-grey);">Input MTD</div>
           </div>
-          <div class="token-stat">
-            <div class="token-stat-label">Tokens Out</div>
-            <div class="token-stat-value" id="token-output">325K</div>
-            <div class="token-stat-sub">Output MTD</div>
+          <div class="token-stat" style="background:rgba(55,70,61,0.06);border-color:rgba(55,70,61,0.1);">
+            <div class="token-stat-label" style="color:var(--light-green);">Tokens Out</div>
+            <div class="token-stat-value" style="color:var(--dark-green);" id="token-output">—</div>
+            <div class="token-stat-sub" style="color:var(--light-grey);">Output MTD</div>
           </div>
-          <div class="token-stat">
-            <div class="token-stat-label">Cost MTD</div>
-            <div class="token-stat-value" id="token-cost">$37.72</div>
-            <div class="token-stat-sub">USD · Actual</div>
+          <div class="token-stat" style="background:rgba(55,70,61,0.06);border-color:rgba(55,70,61,0.1);">
+            <div class="token-stat-label" style="color:var(--light-green);">Cost MTD</div>
+            <div class="token-stat-value" style="color:var(--dark-green);" id="token-cost">$—</div>
+            <div class="token-stat-sub" style="color:var(--light-grey);">USD · Actual</div>
           </div>
-          <div class="token-stat">
-            <div class="token-stat-label">Budget Left</div>
-            <div class="token-stat-value" id="token-remaining">$62.28</div>
-            <div class="token-stat-sub">of $100 limit</div>
+          <div class="token-stat" style="background:rgba(55,70,61,0.06);border-color:rgba(55,70,61,0.1);">
+            <div class="token-stat-label" style="color:var(--light-green);">Budget Left</div>
+            <div class="token-stat-value" style="color:var(--dark-green);" id="token-remaining">$—</div>
+            <div class="token-stat-sub" style="color:var(--light-grey);">of $100 limit</div>
           </div>
         </div>
 
         <!-- Spend limit bar -->
         <div class="token-bar-section">
           <div class="token-bar-header">
-            <div class="token-bar-label">Monthly spend limit — $100.00</div>
-            <div class="token-bar-pct" id="token-bar-pct">37.7% used · resets Apr 1</div>
+            <div class="token-bar-label" style="color:var(--dark-grey);">Monthly spend limit — $100.00</div>
+            <div class="token-bar-pct" style="color:var(--forest-green);" id="token-bar-pct">— used</div>
           </div>
-          <div class="token-bar-track">
-            <div class="token-bar-fill" id="token-bar-fill" style="width: 37.7%"></div>
+          <div class="token-bar-track" style="background:rgba(55,70,61,0.1);">
+            <div class="token-bar-fill" id="token-bar-fill" style="width:0%"></div>
           </div>
         </div>
 
-        <!-- Line chart -->
-        <div style="margin-top: 24px;">
-          <div style="font-size:10px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:14px;">
-            Daily spend — March 2026
+        <!-- Daily spend spark chart -->
+        <div style="margin-top:24px;">
+          <div style="font-size:10px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:var(--light-green);margin-bottom:14px;">
+            Daily spend
           </div>
-          <div style="position:relative; height: 120px; width: 100%;">
+          <div style="position:relative;height:120px;width:100%;">
             <canvas id="cost-chart" style="width:100%;height:120px;"></canvas>
           </div>
-          <div id="chart-tooltip" style="position:absolute;display:none;background:rgba(30,40,35,0.95);border:1px solid rgba(255,255,255,0.15);padding:6px 10px;border-radius:4px;font-size:11px;color:rgba(255,255,255,0.9);pointer-events:none;z-index:10;"></div>
+          <div id="chart-tooltip" style="position:fixed;display:none;background:rgba(55,70,61,0.92);border:1px solid rgba(55,70,61,0.2);padding:6px 10px;border-radius:4px;font-size:11px;color:rgba(255,255,255,0.9);pointer-events:none;z-index:10;"></div>
+        </div>
+
+        <!-- Combined totals strip -->
+        <div style="display:flex;gap:24px;flex-wrap:wrap;padding-top:20px;border-top:1px solid rgba(55,70,61,0.1);margin-top:20px;">
+          <div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--light-green);margin-bottom:4px;">Model</div>
+            <div style="font-size:14px;font-weight:bold;color:var(--dark-green);">Claude Sonnet 4.6</div>
+          </div>
+          <div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--light-green);margin-bottom:4px;">Organization</div>
+            <div style="font-size:14px;font-weight:bold;color:var(--dark-green);">WeekAway Inc.</div>
+          </div>
+          <div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--light-green);margin-bottom:4px;">Runtime</div>
+            <div style="font-size:14px;font-weight:bold;color:var(--dark-green);">OpenClaw 2026.3</div>
+          </div>
         </div>
 
       </div>
@@ -1053,7 +1219,7 @@
   </div>
 
   <!-- SYSTEM HEALTH -->
-  <div class="section">
+  <div class="section" id="sec-wave-health">
     <div class="section-header">
       <div class="section-label">System Health</div>
       <div class="section-line"></div>
@@ -1168,138 +1334,252 @@
     </div>
   </div>
 
-  <!-- ARCHITECTURE MIND MAP -->
-  <div class="section">
+  <!-- WAVE AGENTS -->
+  <div class="section" id="sec-wave-agents">
     <div class="section-header">
-      <div class="section-label">System Architecture</div>
+      <div class="section-label">WAVE Agent Personalities</div>
       <div class="section-line"></div>
     </div>
-    <div class="grid-surface arch-panel">
-      <div class="arch-panel-inner">
-        <div class="arch-panel-title">Integration map — all connected systems</div>
+    <div class="agents-grid">
 
-        <div class="mindmap">
-          <!-- Center node -->
-          <div class="mm-center">
-            <div class="mm-center-icon">🤖</div>
-            <div class="mm-center-name">WAVE</div>
-            <div class="mm-center-sub">Claude Sonnet 4.6 via OpenClaw</div>
-          </div>
-
-          <!-- Connector to spokes -->
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);width:100%;margin-top:0;">
-            <div style="display:flex;justify-content:center;"><div style="width:1px;height:24px;background:rgba(255,255,255,0.12);"></div></div>
-            <div style="display:flex;justify-content:center;"><div style="width:1px;height:24px;background:rgba(255,255,255,0.25);"></div></div>
-            <div style="display:flex;justify-content:center;"><div style="width:1px;height:24px;background:rgba(255,255,255,0.12);"></div></div>
-          </div>
-
-          <!-- Spoke nodes -->
-          <div class="mm-spokes">
-
-            <div class="mm-spoke">
-              <div class="mm-node">
-                <div class="mm-node-icon">🏠</div>
-                <div class="mm-node-name">Hospitable</div>
-                <div class="mm-node-sub">Guest messaging & reservation management</div>
-                <div class="mm-node-tag">Webhooks · REST API v2</div>
-              </div>
-            </div>
-
-            <div class="mm-spoke">
-              <div class="mm-node">
-                <div class="mm-node-icon">💬</div>
-                <div class="mm-node-name">Slack</div>
-                <div class="mm-node-sub">Primary operator interface, 6 channels</div>
-                <div class="mm-node-tag">Bot API · OpenClaw</div>
-              </div>
-            </div>
-
-            <div class="mm-spoke">
-              <div class="mm-node">
-                <div class="mm-node-icon">💰</div>
-                <div class="mm-node-name">PriceLabs</div>
-                <div class="mm-node-sub">Dynamic pricing & override management</div>
-                <div class="mm-node-tag">REST API v1 · smartbnb</div>
-              </div>
-            </div>
-
-            <div class="mm-spoke">
-              <div class="mm-node">
-                <div class="mm-node-icon">📊</div>
-                <div class="mm-node-name">QuickBooks</div>
-                <div class="mm-node-sub">P&L, balance sheet, revenue by property</div>
-                <div class="mm-node-tag">OAuth2 · REST API v3</div>
-              </div>
-            </div>
-
-            <div class="mm-spoke">
-              <div class="mm-node">
-                <div class="mm-node-icon">📱</div>
-                <div class="mm-node-name">WhatsApp</div>
-                <div class="mm-node-sub">Cleaning team outbound coordination</div>
-                <div class="mm-node-tag">OpenClaw native</div>
-              </div>
-            </div>
-
-            <div class="mm-spoke">
-              <div class="mm-node">
-                <div class="mm-node-icon">🌐</div>
-                <div class="mm-node-name">Google Workspace</div>
-                <div class="mm-node-sub">Gmail, Calendar, Drive access</div>
-                <div class="mm-node-tag">gog CLI · OAuth2</div>
-              </div>
-            </div>
-
-            <div class="mm-spoke">
-              <div class="mm-node">
-                <div class="mm-node-icon">🪝</div>
-                <div class="mm-node-name">Webhook Server</div>
-                <div class="mm-node-sub">Event ingestion & noise filtering</div>
-                <div class="mm-node-tag">Python · Port 8080</div>
-              </div>
-            </div>
-
-            <div class="mm-spoke">
-              <div class="mm-node">
-                <div class="mm-node-icon">☁️</div>
-                <div class="mm-node-name">Cloudflare</div>
-                <div class="mm-node-sub">DNS, tunnel routing & zero-trust</div>
-                <div class="mm-node-tag">Tunnel · Zero Trust</div>
-              </div>
-            </div>
-
-            <div class="mm-spoke">
-              <div class="mm-node">
-                <div class="mm-node-icon">💻</div>
-                <div class="mm-node-name">Mac Mini M4</div>
-                <div class="mm-node-sub">Headless server, always-on infrastructure</div>
-                <div class="mm-node-tag">macOS · Arm64 · SSH</div>
-              </div>
-            </div>
-
-          </div>
+      <div class="agent-card">
+        <div class="agent-card-header">
+          <div class="agent-avatar">🏨</div>
+          <div class="agent-role">Guest Experience</div>
+          <div class="agent-title">Director of Hospitality</div>
+          <div class="agent-channel">#wave-guests</div>
         </div>
-
-        <div class="arch-stack">
-          <div class="arch-stack-item">Claude Sonnet 4.6</div>
-          <div class="arch-stack-item">OpenClaw 2026.3</div>
-          <div class="arch-stack-item">Python 3.9</div>
-          <div class="arch-stack-item">Node.js 25</div>
-          <div class="arch-stack-item">Cloudflare Tunnel</div>
-          <div class="arch-stack-item">macOS · Arm64</div>
-          <div class="arch-stack-item">Hospitable API v2</div>
-          <div class="arch-stack-item">PriceLabs API v1</div>
-          <div class="arch-stack-item">QuickBooks OAuth2</div>
-          <div class="arch-stack-item">WhatsApp via OpenClaw</div>
-          <div class="arch-stack-item">Google Workspace</div>
-          <div class="arch-stack-item">Slack Bot API</div>
+        <div class="agent-body">
+          <div class="agent-vp">Monitors all guest communications, drafts Ritz-Carlton-tone responses, and flags anything requiring Philip's attention.</div>
+          <div class="agent-handles">
+            <div class="agent-handle-item">Inbound guest messages & questions</div>
+            <div class="agent-handle-item">Review response drafting</div>
+            <div class="agent-handle-item">Pack and play & high chair coordination</div>
+            <div class="agent-handle-item">Lost item & early check-in decisions</div>
+          </div>
         </div>
       </div>
+
+      <div class="agent-card">
+        <div class="agent-card-header">
+          <div class="agent-avatar">⚙️</div>
+          <div class="agent-role">Operations</div>
+          <div class="agent-title">Chief Operating Officer</div>
+          <div class="agent-channel">#wave-ops</div>
+        </div>
+        <div class="agent-body">
+          <div class="agent-vp">Manages day-to-day operations, nightly turnover briefings, maintenance tracking, and cleaner coordination via Snow.</div>
+          <div class="agent-handles">
+            <div class="agent-handle-item">Nightly 8PM turnover briefings</div>
+            <div class="agent-handle-item">Reminder & task scheduling</div>
+            <div class="agent-handle-item">Maintenance flag management</div>
+            <div class="agent-handle-item">Calendar blocking & date management</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-card-header">
+          <div class="agent-avatar">💰</div>
+          <div class="agent-role">Revenue</div>
+          <div class="agent-title">Revenue & Pricing Strategist</div>
+          <div class="agent-channel">#wave-pricing</div>
+        </div>
+        <div class="agent-body">
+          <div class="agent-vp">Manages dynamic pricing strategy, identifies booking gaps, executes PriceLabs overrides, and surfaces upsell opportunities.</div>
+          <div class="agent-handles">
+            <div class="agent-handle-item">PriceLabs override management</div>
+            <div class="agent-handle-item">Gap pricing recommendations</div>
+            <div class="agent-handle-item">Upsell extension pricing</div>
+            <div class="agent-handle-item">Market occupancy monitoring</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-card-header">
+          <div class="agent-avatar">📊</div>
+          <div class="agent-role">Finance</div>
+          <div class="agent-title">Chief Financial Analyst</div>
+          <div class="agent-channel">#wave-financials</div>
+        </div>
+        <div class="agent-body">
+          <div class="agent-vp">Pulls live P&L data from QuickBooks, tracks revenue vs goals by property, and delivers CEO-level financial insight on demand.</div>
+          <div class="agent-handles">
+            <div class="agent-handle-item">Real-time P&L by property</div>
+            <div class="agent-handle-item">Revenue vs goal tracking</div>
+            <div class="agent-handle-item">Commission & expense analysis</div>
+            <div class="agent-handle-item">Balance sheet snapshots</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-card-header">
+          <div class="agent-avatar">📋</div>
+          <div class="agent-role">Reporting</div>
+          <div class="agent-title">Executive Reporting Analyst</div>
+          <div class="agent-channel">#wave-reports</div>
+        </div>
+        <div class="agent-body">
+          <div class="agent-vp">Delivers weekly Sunday portfolio briefings and monthly management reports pulling from all connected data sources.</div>
+          <div class="agent-handles">
+            <div class="agent-handle-item">Weekly Sunday 8AM portfolio briefing</div>
+            <div class="agent-handle-item">Monthly management reports</div>
+            <div class="agent-handle-item">Occupancy & revenue summaries</div>
+            <div class="agent-handle-item">Action item generation</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-card-header">
+          <div class="agent-avatar">🧠</div>
+          <div class="agent-role">Strategy</div>
+          <div class="agent-title">Chief of Staff</div>
+          <div class="agent-channel">#wave-general</div>
+        </div>
+        <div class="agent-body">
+          <div class="agent-vp">General-purpose strategic thinking, portfolio expansion analysis, vendor research, and anything that doesn't fit a specific channel.</div>
+          <div class="agent-handles">
+            <div class="agent-handle-item">Portfolio expansion analysis</div>
+            <div class="agent-handle-item">Vendor & contractor research</div>
+            <div class="agent-handle-item">Ad-hoc strategic questions</div>
+            <div class="agent-handle-item">Email & calendar via Google Workspace</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INTEGRATION MAP -->
+  <div class="section" id="sec-wave-integrations">
+    <div class="section-header">
+      <div class="section-label">Integration Map</div>
+      <div class="section-line"></div>
+    </div>
+    <div style="background:#EFEFED;border-radius:4px;padding:28px;box-shadow:0 1px 3px rgba(55,70,61,0.07);">
+
+      <!-- Center label -->
+      <div style="text-align:center;margin-bottom:28px;">
+        <div style="display:inline-flex;align-items:center;gap:10px;background:var(--dark-green);color:white;border-radius:6px;padding:12px 24px;">
+          <span style="font-size:20px;">🤖</span>
+          <div style="text-align:left;">
+            <div style="font-size:13px;font-weight:bold;">WAVE</div>
+            <div style="font-size:10px;opacity:0.5;">Claude Sonnet 4.6 · OpenClaw 2026.3</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Integration nodes grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+
+        <div style="background:var(--white);border-radius:4px;padding:14px 16px;box-shadow:0 1px 3px rgba(55,70,61,0.07);display:flex;gap:12px;align-items:flex-start;">
+          <div style="font-size:18px;flex-shrink:0;">🏠</div>
+          <div>
+            <div style="font-size:12px;font-weight:bold;color:var(--dark-green);margin-bottom:2px;">Hospitable</div>
+            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">Guest messaging, reservations, calendar, webhooks</div>
+            <div style="font-size:9px;color:var(--light-green);margin-top:4px;font-weight:bold;letter-spacing:0.06em;">REST API v2 · Webhooks</div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);border-radius:4px;padding:14px 16px;box-shadow:0 1px 3px rgba(55,70,61,0.07);display:flex;gap:12px;align-items:flex-start;">
+          <div style="font-size:18px;flex-shrink:0;">💬</div>
+          <div>
+            <div style="font-size:12px;font-weight:bold;color:var(--dark-green);margin-bottom:2px;">Slack</div>
+            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">6 agent channels, primary operator interface</div>
+            <div style="font-size:9px;color:var(--light-green);margin-top:4px;font-weight:bold;letter-spacing:0.06em;">Bot API · OpenClaw</div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);border-radius:4px;padding:14px 16px;box-shadow:0 1px 3px rgba(55,70,61,0.07);display:flex;gap:12px;align-items:flex-start;">
+          <div style="font-size:18px;flex-shrink:0;">💰</div>
+          <div>
+            <div style="font-size:12px;font-weight:bold;color:var(--dark-green);margin-bottom:2px;">PriceLabs</div>
+            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">Dynamic pricing, date overrides, occupancy data</div>
+            <div style="font-size:9px;color:var(--light-green);margin-top:4px;font-weight:bold;letter-spacing:0.06em;">REST API v1 · smartbnb</div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);border-radius:4px;padding:14px 16px;box-shadow:0 1px 3px rgba(55,70,61,0.07);display:flex;gap:12px;align-items:flex-start;">
+          <div style="font-size:18px;flex-shrink:0;">📊</div>
+          <div>
+            <div style="font-size:12px;font-weight:bold;color:var(--dark-green);margin-bottom:2px;">QuickBooks</div>
+            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">P&L, balance sheet, revenue by property class</div>
+            <div style="font-size:9px;color:var(--light-green);margin-top:4px;font-weight:bold;letter-spacing:0.06em;">OAuth2 · REST API v3</div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);border-radius:4px;padding:14px 16px;box-shadow:0 1px 3px rgba(55,70,61,0.07);display:flex;gap:12px;align-items:flex-start;">
+          <div style="font-size:18px;flex-shrink:0;">📱</div>
+          <div>
+            <div style="font-size:12px;font-weight:bold;color:var(--dark-green);margin-bottom:2px;">WhatsApp</div>
+            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">Outbound cleaner coordination via Snow</div>
+            <div style="font-size:9px;color:var(--light-green);margin-top:4px;font-weight:bold;letter-spacing:0.06em;">OpenClaw Native</div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);border-radius:4px;padding:14px 16px;box-shadow:0 1px 3px rgba(55,70,61,0.07);display:flex;gap:12px;align-items:flex-start;">
+          <div style="font-size:18px;flex-shrink:0;">🌐</div>
+          <div>
+            <div style="font-size:12px;font-weight:bold;color:var(--dark-green);margin-bottom:2px;">Google Workspace</div>
+            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">Gmail, Calendar, Drive via philip@weekaway.com</div>
+            <div style="font-size:9px;color:var(--light-green);margin-top:4px;font-weight:bold;letter-spacing:0.06em;">gog CLI · OAuth2</div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);border-radius:4px;padding:14px 16px;box-shadow:0 1px 3px rgba(55,70,61,0.07);display:flex;gap:12px;align-items:flex-start;">
+          <div style="font-size:18px;flex-shrink:0;">🪝</div>
+          <div>
+            <div style="font-size:12px;font-weight:bold;color:var(--dark-green);margin-bottom:2px;">Webhook Server</div>
+            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">Event ingestion, noise filtering, agent triggers</div>
+            <div style="font-size:9px;color:var(--light-green);margin-top:4px;font-weight:bold;letter-spacing:0.06em;">Python · Port 8080</div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);border-radius:4px;padding:14px 16px;box-shadow:0 1px 3px rgba(55,70,61,0.07);display:flex;gap:12px;align-items:flex-start;">
+          <div style="font-size:18px;flex-shrink:0;">☁️</div>
+          <div>
+            <div style="font-size:12px;font-weight:bold;color:var(--dark-green);margin-bottom:2px;">Cloudflare</div>
+            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">DNS, tunnel routing, zero-trust access</div>
+            <div style="font-size:9px;color:var(--light-green);margin-top:4px;font-weight:bold;letter-spacing:0.06em;">Tunnel · Zero Trust</div>
+          </div>
+        </div>
+
+        <div style="background:var(--white);border-radius:4px;padding:14px 16px;box-shadow:0 1px 3px rgba(55,70,61,0.07);display:flex;gap:12px;align-items:flex-start;">
+          <div style="font-size:18px;flex-shrink:0;">💻</div>
+          <div>
+            <div style="font-size:12px;font-weight:bold;color:var(--dark-green);margin-bottom:2px;">Mac Mini M4</div>
+            <div style="font-size:11px;color:var(--dark-grey);line-height:1.5;">Headless always-on server, SSH, LaunchAgents</div>
+            <div style="font-size:9px;color:var(--light-green);margin-top:4px;font-weight:bold;letter-spacing:0.06em;">macOS · Arm64</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tech stack strip -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;padding-top:20px;border-top:1px solid rgba(55,70,61,0.1);">
+        <div style="font-size:9px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;color:var(--light-green);width:100%;margin-bottom:4px;">Tech Stack</div>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">Claude Sonnet 4.6</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">OpenClaw 2026.3</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">Python 3.9</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">Node.js 25</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">Cloudflare Tunnel</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">macOS Arm64</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">Hospitable API v2</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">PriceLabs API v1</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">QuickBooks OAuth2</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">WhatsApp · OpenClaw</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">Google Workspace</span>
+        <span style="font-size:10px;background:rgba(55,70,61,0.08);color:var(--forest-green);padding:3px 9px;border-radius:2px;font-weight:bold;">Slack Bot API</span>
+      </div>
+
     </div>
   </div>
 
   <!-- API INTEGRATIONS -->
-  <div class="section">
+  <div class="section" id="sec-wave-integrations2">
     <div class="section-header">
       <div class="section-label">API Integrations</div>
       <div class="section-line"></div>
@@ -1382,7 +1662,7 @@
   </div>
 
   <!-- ACTIVITY FEED -->
-  <div class="section">
+  <div class="section" id="sec-wave-activity">
     <div class="section-header">
       <div class="section-label">Recent Activity</div>
       <div class="section-line"></div>
@@ -1445,7 +1725,7 @@
   </div>
 
   <!-- CURRENT FEATURES -->
-  <div class="section">
+  <div class="section" id="sec-wave-features">
     <div class="section-header">
       <div class="section-label">Current Features</div>
       <div class="section-line"></div>
@@ -1801,7 +2081,7 @@
   <div class="ornament">✦</div>
 
   <!-- ROADMAP -->
-  <div class="section">
+  <div class="section" id="sec-wave-roadmap">
     <div class="section-header">
       <div class="section-label">Upcoming Features</div>
       <div class="section-line"></div>
@@ -1885,7 +2165,7 @@
   </div>
 
   <!-- CHANGELOG -->
-  <div class="section">
+  <div class="section" id="sec-wave-changelog">
     <div class="section-header">
       <div class="section-label">Changelog</div>
       <div class="section-line"></div>
@@ -1962,6 +2242,7 @@
       <div class="header-main">
         <div class="header-title-block">
           <h1>W<em>AVE</em></h1>
+          <div style="font-size:10px;font-weight:bold;letter-spacing:0.22em;text-transform:uppercase;color:var(--light-green);margin-top:10px;">WeekAway Virtual Executive</div>
           <div class="header-divider"></div>
           <p>Live revenue, occupancy, booking gaps, and calendar availability for Sisters' Summit and Sisters' Solstice. Data pulled nightly from Hospitable and QuickBooks via WAVE snapshot.</p>
         </div>
@@ -1986,6 +2267,7 @@
   </div>
 
   <!-- OPS SUBNAV -->
+  <div style="font-size:9px;font-weight:bold;letter-spacing:0.14em;text-transform:uppercase;color:var(--light-green);margin-bottom:8px;">Categories</div>
   <nav class="ops-subnav">
     <a class="ops-subnav-item" href="#sec-portfolio">Portfolio</a>
     <a class="ops-subnav-item" href="#sec-monthly">Monthly</a>
@@ -2230,6 +2512,28 @@
           <div style="font-size:11px;color:var(--light-green);" id="s-need-label">Calculating...</div>
 
         </div>
+
+        <!-- Expand toggle -->
+        <button class="untapped-toggle" onclick="toggleUntapped('s')">
+          <span id="s-toggle-label">Monthly breakdown</span>
+          <span id="s-toggle-arrow">▾</span>
+        </button>
+
+        <!-- Monthly breakdown -->
+        <div class="untapped-expand" id="s-untapped-expand">
+          <table class="untapped-month-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Open Nights</th>
+                <th>Potential Revenue</th>
+                <th class="col-avail">Availability</th>
+              </tr>
+            </thead>
+            <tbody id="s-monthly-breakdown"></tbody>
+          </table>
+        </div>
+
       </div>
 
       <!-- SOLSTICE UNTAPPED -->
@@ -2264,6 +2568,28 @@
           <div style="font-size:11px;color:var(--light-green);" id="sol-need-label">Calculating...</div>
 
         </div>
+
+        <!-- Expand toggle -->
+        <button class="untapped-toggle" onclick="toggleUntapped('sol')">
+          <span id="sol-toggle-label">Monthly breakdown</span>
+          <span id="sol-toggle-arrow">▾</span>
+        </button>
+
+        <!-- Monthly breakdown -->
+        <div class="untapped-expand" id="sol-untapped-expand">
+          <table class="untapped-month-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Open Nights</th>
+                <th>Potential Revenue</th>
+                <th class="col-avail">Availability</th>
+              </tr>
+            </thead>
+            <tbody id="sol-monthly-breakdown"></tbody>
+          </table>
+        </div>
+
       </div>
 
     </div>
@@ -2283,11 +2609,11 @@
           </div>
           <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--forest-green);">
-              <div style="width:12px;height:2px;background:var(--forest-green);border-radius:1px"></div>
+              <div style="width:12px;height:2px;background:#8B9B91;border-radius:1px"></div>
               Summit
             </div>
             <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dark-blue);">
-              <div style="width:12px;height:2px;background:var(--dark-blue);border-radius:1px"></div>
+              <div style="width:12px;height:2px;background:#5F93C0;border-radius:1px"></div>
               Solstice
             </div>
           </div>
@@ -2415,8 +2741,10 @@
   function switchPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
-    document.getElementById('nav-' + page).classList.add('active');
+    const pageEl = document.getElementById('page-' + page);
+    const navEl  = document.getElementById('nav-' + page);
+    if (pageEl) pageEl.classList.add('active');
+    if (navEl)  navEl.classList.add('active');
     window.scrollTo(0, 0);
     closeNav();
     if (page === 'ops') renderOpsPage();
@@ -2475,12 +2803,12 @@
     const cW = W - pad.left - pad.right;
     const cH = H - pad.top - pad.bottom;
 
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(55,70,61,0.08)'; ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
       const y = pad.top + (cH / 4) * i;
       ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cW, y); ctx.stroke();
       const val = maxVal - (maxVal / 4) * i;
-      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.fillStyle = 'rgba(55,70,61,0.5)';
       ctx.font = '9px Arial'; ctx.textAlign = 'right';
       ctx.fillText('$' + val.toFixed(val < 1 ? 2 : 0), pad.left - 4, y + 3);
     }
@@ -2519,7 +2847,7 @@
       }
     });
 
-    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.fillStyle = 'rgba(55,70,61,0.5)';
     ctx.font = '9px Arial'; ctx.textAlign = 'center';
     dates.forEach((d, i) => {
       if (i % 5 === 0 || i === dates.length - 1)
@@ -2627,7 +2955,65 @@
   }
 
   // ══════════════════════════════════════════
-  //  ANNUAL REVENUE CHART
+  //  UNTAPPED MONTHLY BREAKDOWN
+  // ══════════════════════════════════════════
+  function toggleUntapped(prefix) {
+    const expand = document.getElementById(prefix + '-untapped-expand');
+    const arrow  = document.getElementById(prefix + '-toggle-arrow');
+    const label  = document.getElementById(prefix + '-toggle-label');
+    const isOpen = expand.classList.contains('open');
+    expand.classList.toggle('open');
+    arrow.textContent  = isOpen ? '▾' : '▴';
+    label.textContent  = isOpen ? 'Monthly breakdown' : 'Hide breakdown';
+  }
+
+  function buildMonthlyBreakdown(tbodyId, bookedDates) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+
+    const now       = new Date();
+    const thisYear  = now.getFullYear();
+    const thisMonth = now.getMonth(); // 0-indexed
+    const MONTHS    = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    const bookedSet = new Set(bookedDates || []);
+    const rows = [];
+
+    for (let m = thisMonth; m < 12; m++) {
+      const daysInMonth = new Date(thisYear, m + 1, 0).getDate();
+      let openNights = 0;
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = thisYear + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+        // Only count future open nights
+        if (dateStr >= now.toISOString().slice(0,10) && !bookedSet.has(dateStr)) {
+          openNights++;
+        }
+      }
+
+      const bookedNights = daysInMonth - openNights;
+      const occPct = Math.round((bookedNights / daysInMonth) * 100);
+
+      // Colour code availability dot
+      const dotColor = occPct >= 70 ? '#2d7a30' : occPct >= 40 ? '#8a7030' : 'var(--dark-red)';
+      const occLabel = occPct >= 70 ? 'Well booked' : occPct >= 40 ? 'Filling up' : 'Open';
+
+      // Rough revenue estimate at ~$600/night average for open nights
+      const potRev = openNights * 600;
+
+      rows.push(`<tr>
+        <td style="font-weight:bold;">${MONTHS[m]}</td>
+        <td class="col-nights-val">${openNights > 0 ? openNights + ' nights' : '—'}</td>
+        <td style="color:var(--dark-red);font-weight:bold;">${openNights > 0 ? '$' + potRev.toLocaleString() : '—'}</td>
+        <td class="col-avail">
+          <span class="occ-dot" style="background:${dotColor};"></span>
+          <span style="font-size:11px;color:var(--dark-grey);">${occLabel} · ${occPct}%</span>
+        </td>
+      </tr>`);
+    }
+
+    tbody.innerHTML = rows.join('');
+  }
   // ══════════════════════════════════════════
   function drawRevChart(summitMonthly, solsticeMonthly) {
     window._lastRevData = [summitMonthly, solsticeMonthly];
@@ -2654,43 +3040,43 @@
     const allVals = [...s, ...sol].filter(v => v !== null && v > 0);
     const maxVal = allVals.length ? Math.max(...allVals) * 1.15 : 10000;
 
-    const pad = { top: 12, right: 12, bottom: 28, left: 56 };
+    const pad = { top: 16, right: 16, bottom: 32, left: 44 };
     const cW = W - pad.left - pad.right;
     const cH = H - pad.top - pad.bottom;
     const step = cW / 11; // 12 months, 11 gaps
 
     // Y grid lines
-    ctx.strokeStyle = 'rgba(55,70,61,0.08)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(42,42,42,0.07)'; ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
       const y = pad.top + (cH / 4) * i;
       ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cW, y); ctx.stroke();
       const val = maxVal - (maxVal / 4) * i;
-      ctx.fillStyle = 'rgba(55,70,61,0.45)';
-      ctx.font = '9px Arial'; ctx.textAlign = 'right';
-      const label = val >= 1000 ? '$' + (val/1000).toFixed(0) + 'k' : '$' + val.toFixed(0);
-      ctx.fillText(label, pad.left - 5, y + 3);
+      ctx.fillStyle = 'rgba(42,42,42,0.55)';
+      ctx.font = '8px Arial'; ctx.textAlign = 'right';
+      const label = val >= 1000 ? '$' + Math.round(val/1000) + 'k' : '$' + Math.round(val);
+      ctx.fillText(label, pad.left - 4, y + 3);
     }
 
-    // Month labels on x axis — skip labels on mobile to prevent overlap
-    ctx.fillStyle = 'rgba(55,70,61,0.4)';
-    ctx.font = '9px Arial'; ctx.textAlign = 'center';
+    // Month labels on x axis
+    ctx.fillStyle = 'rgba(42,42,42,0.5)';
+    ctx.font = '8px Arial'; ctx.textAlign = 'center';
     const showEvery = W < 400 ? 3 : W < 600 ? 2 : 1;
     MONTHS.forEach((m, i) => {
       if (i % showEvery !== 0) return;
-      const label = W < 400 ? m.slice(0,1) : m;
-      ctx.fillText(label, pad.left + step * i, H - 6);
+      const label = W < 500 ? m.slice(0,1) : m.slice(0,3);
+      ctx.fillText(label, pad.left + step * i, H - 8);
     });
 
     // Current month marker
     const cx = pad.left + step * currentMonth;
-    ctx.strokeStyle = 'rgba(55,70,61,0.15)';
+    ctx.strokeStyle = 'rgba(42,42,42,0.12)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3,3]);
     ctx.beginPath(); ctx.moveTo(cx, pad.top); ctx.lineTo(cx, pad.top + cH); ctx.stroke();
     ctx.setLineDash([]);
 
     // Helper: draw a line
-    function drawLine(monthly, color, isDash) {
+    function drawLine(monthly, color) {
       const pts = monthly.map((v, i) => ({
         x: pad.left + step * i,
         y: v !== null ? pad.top + cH - (v / maxVal) * cH : null,
@@ -2705,18 +3091,18 @@
           const cp1x = (solidPts[i-1].x + solidPts[i].x) / 2;
           ctx.bezierCurveTo(cp1x, solidPts[i-1].y, cp1x, solidPts[i].y, solidPts[i].x, solidPts[i].y);
         }
-        ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+        ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.stroke();
       }
 
-      // Dotted future segment
-      const futurePts = pts.filter(p => p.idx >= currentMonth && p.val === null);
-      // Just draw a flat dotted continuation from last known point
-      if (solidPts.length > 0) {
+      // Dotted future line — only if December isn't the current month
+      if (solidPts.length > 0 && currentMonth < 11) {
         const last = solidPts[solidPts.length - 1];
-        ctx.setLineDash([4,4]);
+        const endX  = pad.left + step * 11;
+        ctx.setLineDash([4, 5]);
         ctx.beginPath(); ctx.moveTo(last.x, last.y);
-        ctx.lineTo(pad.left + step * 11, last.y);
-        ctx.strokeStyle = color.replace('0.9', '0.25').replace('1)', '0.2)');
+        ctx.lineTo(endX, last.y);
+        // Parse color and apply low opacity
+        ctx.strokeStyle = color + '44';
         ctx.lineWidth = 1.5; ctx.stroke();
         ctx.setLineDash([]);
       }
@@ -2724,15 +3110,20 @@
       // Dots on solid points
       solidPts.forEach(p => {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.idx === currentMonth ? 4 : 3, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.idx === currentMonth ? 4.5 : 3, 0, Math.PI * 2);
         ctx.fillStyle = color; ctx.fill();
+        // White centre on current month dot
+        if (p.idx === currentMonth) {
+          ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = '#EFEFED'; ctx.fill();
+        }
       });
 
       return pts;
     }
 
-    const sPts = drawLine(s, '#506959');
-    const solPts = drawLine(sol, '#265D96');
+    const sPts   = drawLine(s,   '#8B9B91');   // light-green
+    const solPts = drawLine(sol, '#5F93C0');   // sky-blue
 
     // Tooltip
     canvas.onmousemove = (e) => {
@@ -2970,6 +3361,10 @@
       solOpen.open_nights, solOpen.open_revenue, solsticeOps.rev_ytd, 382589,
       'sol-open-nights', 'sol-open-revenue', 'sol-need-pct', 'sol-need-bar', 'sol-need-label'
     );
+
+    // Build monthly breakdown tables (pre-rendered, shown on expand)
+    buildMonthlyBreakdown('s-monthly-breakdown', summitDates);
+    buildMonthlyBreakdown('sol-monthly-breakdown', solsticeDates);
     function calcOcc(dates, days) {
       const today = new Date();
       const bookedSet = new Set(dates);
@@ -3153,7 +3548,8 @@
           document.getElementById('token-remaining').textContent = fmt$(limit - cost);
           document.getElementById('token-bar-pct').textContent = pct + '% used · resets Apr 1';
           document.getElementById('token-bar-fill').style.width = pct + '%';
-          if (parseFloat(pct) > 80) document.getElementById('token-bar-fill').classList.add('warn');
+          const barFill = document.getElementById('token-bar-fill');
+          if (parseFloat(pct) > 80 && barFill) barFill.classList.add('warn');
         }
         if (t.month) document.getElementById('token-month').textContent = t.month;
         if (t.period) document.getElementById('token-period').textContent = t.period;
@@ -3161,7 +3557,8 @@
       }
 
       // Re-render ops if page is visible
-      if (document.getElementById('page-ops').classList.contains('active')) renderOpsPage();
+      const opsPage = document.getElementById('page-ops');
+      if (opsPage && opsPage.classList.contains('active')) renderOpsPage();
 
     } catch (e) {
       document.getElementById('snapshot-timestamp').textContent = 'Awaiting first snapshot';
@@ -3227,7 +3624,17 @@
     _origSwitch(page);
     setTimeout(() => initFadeUps('page-' + page), 10);
   };
+
+  // ── Back to top ──
+  window.addEventListener('scroll', () => {
+    const bttBtn = document.getElementById('back-to-top');
+    if (!bttBtn) return;
+    if (window.scrollY > 300) bttBtn.classList.add('visible');
+    else bttBtn.classList.remove('visible');
+  });
 </script>
+
+<button class="back-to-top" id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 
 </body>
 </html>
