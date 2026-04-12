@@ -2852,8 +2852,11 @@
     ctx.fillStyle = 'rgba(55,70,61,0.5)';
     ctx.font = '9px Arial'; ctx.textAlign = 'center';
     dates.forEach((d, i) => {
-      if (i % 5 === 0 || i === dates.length - 1)
-        ctx.fillText('Mar ' + d.slice(8), pts[i].x, H - 6);
+      if (i % 5 === 0 || i === dates.length - 1) {
+        const dateObj = new Date(d + 'T00:00:00');
+        const label = dateObj.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+        ctx.fillText(label, pts[i].x, H - 6);
+      }
     });
 
     canvas.onmousemove = (e) => {
