@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>WAVE — Neural Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --dg:#37463D;--fg:#506959;--red:#953D22;--yel:#D8D294;--ow:#F4F2EE;--bg:#050908;
+    --script:#D8D294;--api:#953D22;--cache:#4caf7d;--slack:#6699ff;--service:#ff9944;--cron:#cc66ff;--prop:#ff6688;
+  }
+  html,body{width:100%;height:100%;background:var(--bg);overflow:hidden;font-family:'DM Mono',monospace;color:var(--ow);cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none}
+  body:active{cursor:grabbing}
+  canvas{position:fixed;top:0;left:0;width:100%;height:100%;display:block}
+  .vignette{position:fixed;inset:0;background:radial-gradient(ellipse at center,transparent 25%,rgba(3,6,5,.95) 100%);pointer-events:none;z-index:2}
+  .scanlines{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.025) 3px,rgba(0,0,0,.025) 4px);pointer-events:none;z-index:3}
+
+  .br2{position:fixed;width:22px;height:22px;z-index:10;pointer-events:none;opacity:.25}
+  .br2::before,.br2::after{content:'';position:absolute;background:var(--yel)}
+  .br2::before{width:1px;height:100%}.br2::after{width:100%;height:1px}
+  .br2.tl{top:12px;left:12px}.br2.tl::before{top:0;left:0}.br2.tl::after{top:0;left:0}
+  .br2.tr{top:12px;right:12px}.br2.tr::before{top:0;right:0}.br2.tr::after{top:0;right:0}
+  .br2.bl{bottom:12px;left:12px}.br2.bl::before{bottom:0;left:0}.br2.bl::after{bottom:0;left:0}
+  .br2.br{bottom:12px;right:12px}.br2.br::before{bottom:0;right:0}.br2.br::after{bottom:0;right:0}
+
+  #hdr{position:fixed;top:0;left:0;right:0;padding:22px 40px 0;z-index:10;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-start}
+  .wm{font-family:'Syncopate',sans-serif;font-weight:700;font-size:12px;letter-spacing:8px;color:var(--yel);text-shadow:0 0 24px rgba(216,210,148,.3)}
+  .tl2{font-size:8px;letter-spacing:4px;color:rgba(244,242,238,.22);margin-top:5px}
+  .ss{text-align:right;font-size:8px;letter-spacing:2px;color:rgba(244,242,238,.22);line-height:2.4}
+  .dot{display:inline-block;width:4px;height:4px;border-radius:50%;background:#4caf7d;margin-right:5px;box-shadow:0 0 5px #4caf7d;animation:pd 2s infinite}
+  @keyframes pd{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* Filter bar */
+  #filters{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:20;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;align-items:center;max-width:calc(100vw - 32px);padding:0 16px}
+  .fbtn{background:rgba(5,9,7,.88);border:1px solid rgba(244,242,238,.1);color:rgba(244,242,238,.35);font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;padding:7px 11px;cursor:pointer;transition:all .2s;white-space:nowrap;pointer-events:all;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  .fbtn:hover{border-color:rgba(244,242,238,.3);color:rgba(244,242,238,.75)}
+  .fbtn.active{color:var(--bg);border-color:transparent}
+  .fbtn[data-type="ALL"]{border-color:rgba(216,210,148,.25);color:rgba(216,210,148,.5)}
+  .fbtn[data-type="ALL"].active{background:var(--yel);color:var(--bg)}
+  .fbtn[data-type="SCRIPT"].active{background:var(--script);color:#111}
+  .fbtn[data-type="API"].active{background:var(--api)}
+  .fbtn[data-type="CACHE"].active{background:var(--cache);color:#111}
+  .fbtn[data-type="SLACK"].active{background:var(--slack)}
+  .fbtn[data-type="SERVICE"].active{background:var(--service);color:#111}
+  .fbtn[data-type="CRON"].active{background:var(--cron)}
+  .fbtn[data-type="PROP"].active{background:var(--prop)}
+
+  /* Drawer */
+  #drawer{position:fixed;top:0;right:0;bottom:0;width:300px;background:rgba(4,8,6,.98);border-left:1px solid rgba(216,210,148,.1);z-index:40;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding:32px 24px 80px;pointer-events:all}
+  #drawer.open{transform:translateX(0)}
+  #drawer::-webkit-scrollbar{width:2px}
+  #drawer::-webkit-scrollbar-thumb{background:rgba(216,210,148,.15)}
+  .dr-close{position:absolute;top:20px;right:20px;background:none;border:none;color:rgba(244,242,238,.25);font-size:18px;cursor:pointer;font-family:'DM Mono',monospace;padding:8px 10px;transition:color .2s;-webkit-tap-highlight-color:transparent}
+  .dr-close:hover{color:var(--ow)}
+  .dr-cluster{font-size:8px;letter-spacing:3px;color:rgba(244,242,238,.28);margin-bottom:6px;margin-top:4px}
+  .dr-name{font-family:'Syncopate',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--yel);margin-bottom:10px;line-height:1.5}
+  .dr-badge{font-size:8px;letter-spacing:2px;padding:3px 9px;border:1px solid;display:inline-block;margin-bottom:14px;border-radius:1px}
+  .dr-divider{width:100%;height:1px;background:rgba(216,210,148,.08);margin:14px 0}
+  .dr-label{font-size:8px;letter-spacing:3px;color:rgba(244,242,238,.28);margin-bottom:6px}
+  .dr-desc{font-size:10px;color:rgba(244,242,238,.55);line-height:1.9;margin-bottom:14px}
+  .dr-conn-count{font-size:20px;font-family:'Syncopate',sans-serif;font-weight:700;color:var(--yel);margin-bottom:4px}
+  .dr-conn-label{font-size:8px;letter-spacing:3px;color:rgba(244,242,238,.28);margin-bottom:14px}
+  .dr-conn-list{display:flex;flex-direction:column;gap:5px}
+  .dr-conn-item{font-size:9px;letter-spacing:1px;color:rgba(244,242,238,.4);padding:5px 8px;border-left:2px solid;display:flex;align-items:center;gap:6px;line-height:1.4}
+  .dr-conn-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+
+  /* Tour */
+  #tour-btn{position:fixed;left:16px;bottom:16px;z-index:20;background:rgba(5,9,7,.88);border:1px solid rgba(216,210,148,.2);color:rgba(216,210,148,.5);font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;padding:7px 14px;cursor:pointer;transition:all .2s;pointer-events:all;-webkit-tap-highlight-color:transparent}
+  #tour-btn:hover{border-color:rgba(216,210,148,.5);color:var(--yel)}
+  #tour-btn.active{background:rgba(216,210,148,.08);border-color:var(--yel);color:var(--yel)}
+  #tour-panel{position:fixed;left:16px;bottom:60px;z-index:20;width:260px;background:rgba(4,8,6,.97);border:1px solid rgba(216,210,148,.18);padding:16px 18px;pointer-events:none;opacity:0;transition:opacity .4s;backdrop-filter:blur(12px)}
+  #tour-panel.visible{opacity:1}
+  .tp-step{font-size:8px;letter-spacing:3px;color:rgba(244,242,238,.28);margin-bottom:6px}
+  .tp-title{font-family:'Syncopate',sans-serif;font-size:10px;font-weight:700;color:var(--yel);margin-bottom:8px;letter-spacing:2px}
+  .tp-text{font-size:9px;color:rgba(244,242,238,.5);line-height:1.9}
+
+  #stats{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:10;pointer-events:none}
+  .stat-row{font-size:8px;letter-spacing:2px;color:rgba(244,242,238,.18);line-height:2.8}
+  .stat-row .v{color:rgba(216,210,148,.55)}
+
+  #legend{position:fixed;left:16px;top:50%;transform:translateY(-50%);z-index:10;pointer-events:none;display:flex;flex-direction:column;gap:9px}
+  .li{display:flex;align-items:center;gap:7px;font-size:8px;letter-spacing:2px;color:rgba(244,242,238,.2)}
+  .ld{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+  #hint{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:2px;color:rgba(244,242,238,.12);z-index:10;pointer-events:none;white-space:nowrap;animation:hf 6s ease forwards}
+  @keyframes hf{0%{opacity:0}15%{opacity:1}70%{opacity:1}100%{opacity:0}}
+
+  @media(max-width:600px){
+    #hdr{padding:16px 16px 0}
+    .wm{font-size:10px;letter-spacing:5px}
+    .tl2,.ss{font-size:7px}
+    #legend,#stats,#tour-btn,#tour-panel,#hint{display:none}
+    #drawer{width:100vw;border-left:none;border-top:1px solid rgba(216,210,148,.1);top:auto;height:60vh;transform:translateY(100%)}
+    #drawer.open{transform:translateY(0)}
+    #filters{bottom:12px;gap:5px;padding:0 10px}
+    .fbtn{font-size:7px;padding:6px 9px;letter-spacing:1px}
+    .br2{width:14px;height:14px}
+  }
+  @media(max-width:380px){.fbtn{font-size:6px;padding:5px 7px;letter-spacing:0}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="vignette"></div>
+<div class="scanlines"></div>
+<div class="br2 tl"></div><div class="br2 tr"></div><div class="br2 bl"></div><div class="br2 br"></div>
+
+<div id="hdr">
+  <div><div class="wm">W·A·V·E</div><div class="tl2">NEURAL ARCHITECTURE MAP</div></div>
+  <div class="ss">
+    <span class="dot"></span>MAC MINI M4 ONLINE<br>
+    <span class="dot"></span>OPENCLAW 2026.3.24<br>
+    <span class="dot"></span>CLOUDFLARE ACTIVE<br>
+    <span class="dot"></span>ALL SERVICES NOMINAL
+  </div>
+</div>
+
+<div id="legend">
+  <div class="li"><div class="ld" style="background:var(--script)"></div>SCRIPT</div>
+  <div class="li"><div class="ld" style="background:var(--api)"></div>API</div>
+  <div class="li"><div class="ld" style="background:var(--cache)"></div>CACHE / FILE</div>
+  <div class="li"><div class="ld" style="background:var(--slack)"></div>SLACK CHANNEL</div>
+  <div class="li"><div class="ld" style="background:var(--service)"></div>SERVICE</div>
+  <div class="li"><div class="ld" style="background:var(--cron)"></div>CRON JOB</div>
+  <div class="li"><div class="ld" style="background:var(--prop)"></div>PROPERTY</div>
+</div>
+
+<div id="stats">
+  <div class="stat-row">NODES<br><span class="v" id="s-nodes">—</span></div>
+  <div class="stat-row">SYNAPSES<br><span class="v" id="s-edges">—</span></div>
+  <div class="stat-row">CLUSTERS<br><span class="v">7</span></div>
+  <div class="stat-row">TOP HUB<br><span class="v" id="s-hub">—</span></div>
+</div>
+
+<div id="drawer">
+  <button class="dr-close" onclick="closeDrawer()">✕</button>
+  <div class="dr-cluster" id="dr-cluster">—</div>
+  <div class="dr-name" id="dr-name">—</div>
+  <div class="dr-badge" id="dr-badge">—</div>
+  <div class="dr-divider"></div>
+  <div class="dr-label">DESCRIPTION</div>
+  <div class="dr-desc" id="dr-desc">—</div>
+  <div class="dr-divider"></div>
+  <div class="dr-conn-count" id="dr-count">0</div>
+  <div class="dr-conn-label">SYNAPTIC CONNECTIONS</div>
+  <div class="dr-conn-list" id="dr-conn-list"></div>
+</div>
+
+<button id="tour-btn" onclick="toggleTour()">▶ GUIDED TOUR</button>
+<div id="tour-panel">
+  <div class="tp-step" id="tp-step">STEP 1 / 7</div>
+  <div class="tp-title" id="tp-title">—</div>
+  <div class="tp-text" id="tp-text">—</div>
+</div>
+
+<div id="filters">
+  <button class="fbtn active" data-type="ALL" onclick="setFilter('ALL')">ALL</button>
+  <button class="fbtn" data-type="SCRIPT" onclick="setFilter('SCRIPT')">SCRIPT</button>
+  <button class="fbtn" data-type="API" onclick="setFilter('API')">API</button>
+  <button class="fbtn" data-type="CACHE" onclick="setFilter('CACHE')">CACHE</button>
+  <button class="fbtn" data-type="SLACK" onclick="setFilter('SLACK')">SLACK</button>
+  <button class="fbtn" data-type="SERVICE" onclick="setFilter('SERVICE')">SERVICE</button>
+  <button class="fbtn" data-type="CRON" onclick="setFilter('CRON')">CRON</button>
+  <button class="fbtn" data-type="PROP" onclick="setFilter('PROP')">PROPERTY</button>
+</div>
+
+<div id="hint">DRAG · SCROLL TO ZOOM · TAP ANY NODE TO INSPECT</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const T={
+  SCRIPT: {color:0xD8D294,label:'SCRIPT',       hex:'#D8D294'},
+  API:    {color:0x953D22,label:'EXTERNAL API', hex:'#953D22'},
+  CACHE:  {color:0x4caf7d,label:'CACHE / FILE', hex:'#4caf7d'},
+  SLACK:  {color:0x6699ff,label:'SLACK CHANNEL',hex:'#6699ff'},
+  SERVICE:{color:0xff9944,label:'SERVICE',       hex:'#ff9944'},
+  CRON:   {color:0xcc66ff,label:'CRON JOB',     hex:'#cc66ff'},
+  PROP:   {color:0xff6688,label:'PROPERTY',      hex:'#ff6688'},
+};
+
+// Asymmetric cluster layout — core nodes dense in center, peripheral pushed out
+const CL={
+  GUEST:  {center:[10,85,5],    name:'GUEST EXPERIENCE'},
+  PRICING:{center:[-85,15,30],  name:'PRICING ENGINE'},
+  FINANCE:{center:[85,25,15],   name:'FINANCIAL CORE'},
+  OPS:    {center:[5,-5,55],    name:'OPERATIONS HUB'},
+  MEMORY: {center:[-60,-60,-10],name:'MEMORY LAYER'},
+  COMMS:  {center:[65,-50,10],  name:'COMMUNICATIONS'},
+  INTEL:  {center:[-10,-90,-30],name:'INTELLIGENCE CORE'},
+};
+
+const NODES=[
+  // GUEST
+  {id:'webhook',      label:'webhook_server.py',          t:T.SERVICE,cl:'GUEST',  desc:'v3.4 — receives all Hospitable events via wave.weekaway.com. Routes messages, reservations, reviews. Triggers real WAVE agent sessions via openclaw agent CLI.',o:[0,0,0]},
+  {id:'send_msg',     label:'send-message.sh',             t:T.SCRIPT, cl:'GUEST',  desc:'POST /v2/reservations/{id}/messages. Delivers approved guest messages to Airbnb/VRBO/Booking.com. Rate limited: 2/min per reservation, 50/5min globally.',o:[-22,14,10]},
+  {id:'get_msgs',     label:'get-messages.sh',             t:T.SCRIPT, cl:'GUEST',  desc:'GET /v2/reservations/{id}/messages. Pulls full conversation history. Guest first names extracted from sender object — only reliable name source.',o:[24,16,6]},
+  {id:'get_res',      label:'get-reservations-named.sh',  t:T.SCRIPT, cl:'GUEST',  desc:'Pulls accepted reservations with cached guest names. Filters status=accepted only. Looks back 14 days to catch in-stay guests the API drops.',o:[-18,-16,14]},
+  {id:'trigger_wave', label:'trigger_wave()',              t:T.SERVICE,cl:'GUEST',  desc:'Most connected node. Shells to openclaw agent --agent main --deliver --reply-channel slack. Must use absolute paths — launchctl has no $PATH.',o:[18,-18,10]},
+  {id:'hosp_api',     label:'Hospitable API',              t:T.API,    cl:'GUEST',  desc:'public.api.hospitable.com/v2. In-stay reservations vanish from /reservations — local cache is the only fix. Arrays must be properties[]= format.',o:[4,28,-12]},
+  {id:'wave_guests',  label:'#wave-guests',                t:T.SLACK,  cl:'GUEST',  desc:'C0AL64CN79D. All guest webhook events. Threading: replyToMode=first, inheritParent=true. Each guest conversation in its own thread.',o:[-28,-4,-10]},
+  {id:'guest_cache',  label:'guest-cache/',                t:T.CACHE,  cl:'GUEST',  desc:'~/.openclaw/guest-cache/{id}.name. One file per reservation with guest first name. Populated by webhook on reservation.created.',o:[30,-2,-6]},
+  {id:'res_cache',    label:'reservation-cache/',          t:T.CACHE,  cl:'GUEST',  desc:'~/.openclaw/reservation-cache/{id}.json. Full reservation JSON. Solves Hospitable in-stay API disappearance permanently.',o:[6,-32,8]},
+  {id:'prop_cache',   label:'res-property-cache/',         t:T.CACHE,  cl:'GUEST',  desc:'~/.openclaw/res-property-cache/{id}.prop. Maps reservation ID → property name for message routing.',o:[20,8,-20]},
+  {id:'block_date',   label:'block-date.sh',               t:T.SCRIPT, cl:'GUEST',  desc:'PUT /v2/properties/{id}/calendar. WAVE autonomously discovered this endpoint and built the script.',o:[-20,10,-18]},
+  // PRICING
+  {id:'pl_api',       label:'PriceLabs API',               t:T.API,    cl:'PRICING',desc:'api.pricelabs.co/v1. pms=smartbnb required on all override endpoints. DELETE returns 500 — workaround: set 0% "Removed by WAVE".',o:[0,22,0]},
+  {id:'get_listings', label:'get-listings.sh',             t:T.SCRIPT, cl:'PRICING',desc:'GET /v1/listings. Occupancy (7/30/60d), base/min/max, market data. Filtered to Sisters properties.',o:[-24,6,12]},
+  {id:'get_overrides',label:'get-overrides.sh',            t:T.SCRIPT, cl:'PRICING',desc:'GET /v1/listings/{id}/overrides?pms=smartbnb. All active date-specific price overrides.',o:[24,6,12]},
+  {id:'set_override', label:'set-override.sh',             t:T.SCRIPT, cl:'PRICING',desc:'POST overrides. percent (-75→500) or fixed. WAVE always reminds Philip to Sync Now after — no API endpoint for sync.',o:[-20,-16,6]},
+  {id:'wave_pricing', label:'#wave-pricing',               t:T.SLACK,  cl:'PRICING',desc:'C0ALF65STV1. Overrides, approvals, gap pricing strategy, proactive recommendations.',o:[20,-16,6]},
+  {id:'summit_pl',    label:'Summit — 1414058',            t:T.PROP,   cl:'PRICING',desc:'Sisters\' Summit. PriceLabs ID: 1414058. 4BR/4BA, max 10. Cleaning $300 charged ($370 actual, $70 loss/clean).',o:[-26,-4,-14]},
+  {id:'solstice_pl',  label:'Solstice — b206ec9a',         t:T.PROP,   cl:'PRICING',desc:'Sisters\' Solstice. PriceLabs ID: b206ec9a. 4BR/4.5BA, max 8. Cleaning $298 charged ($371 actual). New Sept 2025.',o:[26,-4,-14]},
+  // FINANCE
+  {id:'qbo_api',      label:'QuickBooks API',              t:T.API,    cl:'FINANCE',desc:'quickbooks.api.intuit.com. OAuth 2.0. Japhda Malta Corp. Realm: 9341452787365178. CAD.',o:[0,22,0]},
+  {id:'qbo_sh',       label:'qbo-api.sh',                  t:T.SCRIPT, cl:'FINANCE',desc:'Master QBO wrapper. Auto-refreshes token on 401, saves new refresh token back to .env.',o:[-22,6,12]},
+  {id:'get_pl',       label:'get-profit-loss.sh',          t:T.SCRIPT, cl:'FINANCE',desc:'GET ProfitAndLoss report. Q1 2026: $119K revenue, $44K net.',o:[22,6,12]},
+  {id:'get_pl_prop',  label:'get-profit-loss-property.sh', t:T.SCRIPT, cl:'FINANCE',desc:'P&L by QuickBooks Class. Summit: 554872, Solstice: 556653.',o:[-22,-14,8]},
+  {id:'get_rev',      label:'get-revenue.sh',              t:T.SCRIPT, cl:'FINANCE',desc:'Monthly revenue breakdown via QBO P&L with monthly iteration.',o:[22,-14,8]},
+  {id:'get_bs',       label:'get-balance-sheet.sh',        t:T.SCRIPT, cl:'FINANCE',desc:'GET BalanceSheet as_of date. Assets, liabilities, equity for Japhda Malta Corp.',o:[0,-26,4]},
+  {id:'refresh_tok',  label:'refresh-token.sh',            t:T.SCRIPT, cl:'FINANCE',desc:'Manual OAuth refresh. Access: 60min TTL. Refresh: 100d TTL. Saves back to .env.',o:[-16,2,-16]},
+  {id:'wave_fin',     label:'#wave-financials',            t:T.SLACK,  cl:'FINANCE',desc:'C0ALR5BTM36. QBO queries, P&L. WAVE uses real data only — never estimates. CEO-level tone.',o:[16,2,-16]},
+  // OPS
+  {id:'add_rem',      label:'add-reminder.sh',             t:T.SCRIPT, cl:'OPS',    desc:'Creates ~/.openclaw/reminders/DATE_TIME_CHANNEL.txt. WAVE sets from conversation — must execute, not acknowledge.',o:[-28,18,0]},
+  {id:'check_rem',    label:'check-reminders.sh',          t:T.SCRIPT, cl:'OPS',    desc:'Every 15min via crontab. Posts due reminders to Slack channel, deletes file.',o:[28,18,0]},
+  {id:'get_turn',     label:'get-tomorrows-turnovers.sh',  t:T.SCRIPT, cl:'OPS',    desc:'Reads reservation-cache/*.json. Groups tomorrow\'s check-ins/checkouts by property. Flags same-day turnovers.',o:[0,28,14]},
+  {id:'nightly_cron', label:'nightly-ops-briefing',        t:T.CRON,   cl:'OPS',    desc:'openclaw cron. 8PM MT daily. Fires get-tomorrows-turnovers.sh → #wave-ops. Isolated session.',o:[-26,-12,10]},
+  {id:'weekly_cron',  label:'weekly-briefing',             t:T.CRON,   cl:'OPS',    desc:'openclaw cron. 8AM MT Sunday. Portfolio briefing → #wave-reports. Hospitable + PriceLabs data.',o:[26,-12,10]},
+  {id:'wave_ops',     label:'#wave-ops',                   t:T.SLACK,  cl:'OPS',    desc:'C0ALR5E868L. Nightly briefings, reminders, flags, maintenance.',o:[-28,2,-12]},
+  {id:'wave_reports', label:'#wave-reports',               t:T.SLACK,  cl:'OPS',    desc:'C0ALJ4ZVD45. Weekly/monthly reports. Block quote format. No tildes.',o:[28,2,-12]},
+  {id:'crontab',      label:'system crontab',              t:T.CRON,   cl:'OPS',    desc:'*/15 * * * * check-reminders.sh. Briefings handled by openclaw native cron.',o:[0,-26,-4]},
+  {id:'snow',         label:'Snow Vaulina',                t:T.SERVICE,cl:'OPS',    desc:'BNB Canmore. Cleaning manager. WhatsApp +15875793121. Tips: $50 (1402) / $51 (1434).',o:[2,4,-22]},
+  // MEMORY
+  {id:'log_guest',    label:'log-guest-interaction.sh',    t:T.SCRIPT, cl:'MEMORY', desc:'Appends to history/guests/<slug>.md. Auto-creates skeleton if new. Logged after Philip approves a send.',o:[-24,16,6]},
+  {id:'recall_guest', label:'recall-guest.sh',             t:T.SCRIPT, cl:'MEMORY', desc:'Reads guest history. Fuzzy fallback. WAVE checks pre-loaded history before calling to avoid double-fetch.',o:[24,16,6]},
+  {id:'log_dec',      label:'log-decision.sh',             t:T.SCRIPT, cl:'MEMORY', desc:'Prepends to decisions/YYYY-MM.md newest-first. Categories: Discount, Pricing override, Philip correction.',o:[-24,-16,6]},
+  {id:'recall_dec',   label:'recall-decisions.sh',         t:T.SCRIPT, cl:'MEMORY', desc:'Extracts sections containing keyword. --month, --limit flags. Called before any pricing decision.',o:[24,-16,6]},
+  {id:'guest_hist',   label:'history/guests/',             t:T.CACHE,  cl:'MEMORY', desc:'77 guest markdown files. Append-only chronological logs. First-name slugs only — API limitation.',o:[0,4,-20]},
+  {id:'dec_hist',     label:'history/decisions/',          t:T.CACHE,  cl:'MEMORY', desc:'Monthly decision files, newest-first. Every correction and override compounds into better judgment.',o:[0,-4,20]},
+  {id:'knowledge',    label:'KNOWLEDGE.md',                t:T.CACHE,  cl:'MEMORY', desc:'~/.openclaw/workspace/KNOWLEDGE.md. Injected into every WAVE session. Single source of truth.',o:[-18,2,12]},
+  {id:'improve_log',  label:'IMPROVEMENTS.log',            t:T.CACHE,  cl:'MEMORY', desc:'Self-improvement log. 3+ same-category = RECURRING PATTERN. Proposes fixes to #wave-general for approval.',o:[18,2,12]},
+  {id:'backfill_sh',  label:'backfill-reservations.sh',    t:T.SCRIPT, cl:'MEMORY', desc:'Pulls 69+ reservations from Hospitable API, 18-month window. Re-run anytime to refresh cache.',o:[0,-22,4]},
+  // COMMS
+  {id:'openclaw',     label:'OpenClaw Gateway',            t:T.SERVICE,cl:'COMMS',  desc:'v2026.3.24. LaunchAgent. Claude → Slack + WhatsApp. Model: claude-sonnet-4-6. Most central service.',o:[0,20,0]},
+  {id:'whatsapp',     label:'WhatsApp Integration',        t:T.SERVICE,cl:'COMMS',  desc:'Linked to +14038193912. dmPolicy+groupPolicy: disabled. Outbound only. New contacts need existing thread first.',o:[-26,4,12]},
+  {id:'wave_wa',      label:'#wave-whatsapp',              t:T.SLACK,  cl:'COMMS',  desc:'C0APH1TPQMQ. Ask → draft → approve → send. Straight quotes only — curly quotes break shell.',o:[26,4,12]},
+  {id:'gog',          label:'gog CLI (gogcli)',            t:T.SERVICE,cl:'COMMS',  desc:'/opt/homebrew/bin/gog. Homebrew. OAuth2/Keychain. GOG_ACCOUNT=philip@weekaway.com required.',o:[-24,-14,4]},
+  {id:'wave_gws',     label:'#wave-gworkspace',            t:T.SLACK,  cl:'COMMS',  desc:'C0APEA2Q9RT. Gmail/Calendar/Drive. All sends require Philip approval.',o:[24,-14,4]},
+  {id:'gmail_api',    label:'Gmail API',                   t:T.API,    cl:'COMMS',  desc:'Google Cloud weekaway-wave (578567420503). OAuth Desktop. Search, read, send with approval.',o:[-16,-4,-16]},
+  {id:'gcal_api',     label:'Google Calendar API',         t:T.API,    cl:'COMMS',  desc:'List/create events with approval. philip@weekaway.com.',o:[16,-4,-16]},
+  {id:'wave_gen',     label:'#wave-general',               t:T.SLACK,  cl:'COMMS',  desc:'C0ALJ50BDFX. Self-improvement proposals. WAVE never self-modifies without Philip approval.',o:[0,-24,8]},
+  // INTEL
+  {id:'cf_tunnel',    label:'Cloudflare Tunnel',           t:T.SERVICE,cl:'INTEL',  desc:'wave-webhook. wave.weekaway.com → localhost:8080. LaunchDaemon, survives reboot.',o:[-26,14,6]},
+  {id:'cf_pages',     label:'Cloudflare Pages',            t:T.SERVICE,cl:'INTEL',  desc:'waveai.weekaway.com. GitHub repo wave-weekaway/wash-dashboard. Auto-deploys.',o:[26,14,6]},
+  {id:'mac_mini',     label:'Mac Mini M4',                 t:T.SERVICE,cl:'INTEL',  desc:'192.168.1.81. macOS arm64. pmset + caffeinate LaunchAgent. autorestart on power failure.',o:[0,26,-6]},
+  {id:'env_file',     label:'.env (credentials)',          t:T.CACHE,  cl:'INTEL',  desc:'~/.openclaw/.env. All API tokens: Hospitable, PriceLabs, QBO suite.',o:[-22,-8,14]},
+  {id:'openclaw_json',label:'openclaw.json',               t:T.CACHE,  cl:'INTEL',  desc:'~/.openclaw/openclaw.json. All 8 channel prompts, tool configs, WhatsApp allowFrom, thread settings.',o:[22,-8,14]},
+  {id:'snapshot_cron',label:'generate-snapshot.sh',        t:T.CRON,   cl:'INTEL',  desc:'2AM UTC nightly. Assembles wave-snapshot.json, pushes to GitHub. Powers dashboard.',o:[-22,-22,0]},
+  {id:'caffeinate',   label:'caffeinate LaunchAgent',      t:T.SERVICE,cl:'INTEL',  desc:'com.weekaway.caffeinate.plist. KeepAlive: true. Backup sleep prevention.',o:[22,-22,0]},
+];
+
+const EDGE_DEFS=[
+  ['webhook','hosp_api'],['webhook','trigger_wave'],['webhook','wave_guests'],
+  ['webhook','wave_ops'],['webhook','guest_cache'],['webhook','res_cache'],
+  ['webhook','prop_cache'],['webhook','cf_tunnel'],
+  ['trigger_wave','openclaw'],['trigger_wave','wave_guests'],['trigger_wave','knowledge'],
+  ['trigger_wave','recall_guest'],
+  ['send_msg','hosp_api'],['get_msgs','hosp_api'],['get_res','hosp_api'],
+  ['get_res','guest_cache'],['send_msg','wave_guests'],['get_msgs','guest_cache'],
+  ['block_date','hosp_api'],
+  ['pl_api','get_listings'],['pl_api','get_overrides'],['pl_api','set_override'],
+  ['get_listings','wave_pricing'],['set_override','wave_pricing'],
+  ['summit_pl','pl_api'],['solstice_pl','pl_api'],
+  ['get_overrides','summit_pl'],['get_overrides','solstice_pl'],
+  ['qbo_api','qbo_sh'],['qbo_sh','get_pl'],['qbo_sh','get_pl_prop'],
+  ['qbo_sh','get_rev'],['qbo_sh','get_bs'],['qbo_sh','refresh_tok'],
+  ['get_pl','wave_fin'],['get_pl_prop','wave_fin'],['get_rev','wave_fin'],
+  ['refresh_tok','env_file'],['qbo_api','env_file'],
+  ['nightly_cron','get_turn'],['nightly_cron','wave_ops'],
+  ['weekly_cron','wave_reports'],['weekly_cron','get_listings'],['weekly_cron','get_pl'],
+  ['add_rem','wave_ops'],['check_rem','crontab'],['check_rem','wave_ops'],
+  ['get_turn','res_cache'],['snow','wave_wa'],['snow','wave_ops'],
+  ['log_guest','guest_hist'],['recall_guest','guest_hist'],
+  ['log_dec','dec_hist'],['recall_dec','dec_hist'],
+  ['log_guest','wave_guests'],['recall_dec','wave_pricing'],
+  ['knowledge','openclaw'],['improve_log','wave_gen'],
+  ['backfill_sh','res_cache'],['backfill_sh','hosp_api'],
+  ['openclaw','whatsapp'],['openclaw','wave_wa'],['openclaw','wave_gen'],
+  ['openclaw','wave_guests'],['openclaw','wave_ops'],['openclaw','wave_pricing'],
+  ['openclaw','wave_fin'],['openclaw','wave_reports'],['openclaw','openclaw_json'],
+  ['gog','gmail_api'],['gog','gcal_api'],['gog','wave_gws'],
+  ['wave_wa','whatsapp'],
+  ['cf_tunnel','webhook'],['mac_mini','openclaw'],['mac_mini','cf_tunnel'],
+  ['mac_mini','env_file'],['mac_mini','openclaw_json'],['mac_mini','caffeinate'],
+  ['snapshot_cron','cf_pages'],
+  ['env_file','hosp_api'],['env_file','pl_api'],
+  ['openclaw_json','openclaw'],['hosp_api','env_file'],['pl_api','env_file'],
+];
+
+const TOUR_STEPS=[
+  {node:'webhook',     title:'THE FRONT DOOR',       text:'Every guest interaction starts here. The webhook server receives events from Hospitable the moment anything happens — a booking, a message, a review. Running 24/7 on the Mac Mini.'},
+  {node:'trigger_wave',title:'THE SPARK',             text:'The most connected node in the system. When a guest message arrives, trigger_wave() fires an openclaw agent session — giving WAVE full context, tools, and memory to draft a response.'},
+  {node:'openclaw',    title:'THE BRAIN STEM',        text:'OpenClaw Gateway connects Claude to Slack and WhatsApp simultaneously, manages all 8 channel personas, and handles threading so every guest conversation stays contained.'},
+  {node:'knowledge',   title:'SHARED MEMORY',         text:'KNOWLEDGE.md is injected into every WAVE session — webhook-triggered, cron, or Philip typing. One file, always current, always available.'},
+  {node:'recall_dec',  title:'INSTITUTIONAL MEMORY',  text:'Before any pricing decision, WAVE checks its decision history. "You declined a similar request on Apr 12." Every correction compounds into better judgment.'},
+  {node:'cf_tunnel',   title:'THE ALWAYS-ON LINK',    text:'Cloudflare Tunnel keeps wave.weekaway.com permanently routed to the webhook server. No port forwarding, no dynamic DNS. Survives reboots as a LaunchDaemon.'},
+  {node:'mac_mini',    title:'THE ENGINE ROOM',        text:'A headless Mac Mini M4 in Vancouver runs everything. pmset + caffeinate LaunchAgent keep it reachable 24/7. IP: 192.168.1.81.'},
+];
+
+// ── SETUP ─────────────────────────────────────────────────
+const nodeById={};
+NODES.forEach(n=>{nodeById[n.id]=n;n.cc=0;n._phase=Math.random()*Math.PI*2;n._freq=0.8+Math.random()*1.4;});
+EDGE_DEFS.forEach(([a,b])=>{if(nodeById[a])nodeById[a].cc++;if(nodeById[b])nodeById[b].cc++;});
+let maxCC=0,hubNode=null;
+NODES.forEach(n=>{if(n.cc>maxCC){maxCC=n.cc;hubNode=n;}});
+document.getElementById('s-hub').textContent=hubNode?hubNode.label.split(/[\s\(]/)[0].toUpperCase():'—';
+document.getElementById('s-nodes').textContent=NODES.length;
+document.getElementById('s-edges').textContent=EDGE_DEFS.length;
+
+// ── THREE SCENE ────────────────────────────────────────────
+const cvs=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas:cvs,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setClearColor(0x000000,0);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,0.1,2000);
+camera.position.set(0,0,340);
+function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+resize();window.addEventListener('resize',resize);
+
+// ── NODE SPHERES with inner glow ──────────────────────────
+// Use two spheres per node: a small solid core + a larger translucent halo
+const nodeMeshes=[];
+const coreGeo=new THREE.SphereGeometry(1,12,12);
+const haloGeo=new THREE.SphereGeometry(1,10,10);
+
+// Dramatic size range: min 0.8, max 7 based on connection count
+function nodeSize(cc){ return Math.min(0.9+cc*0.55,7); }
+
+NODES.forEach(node=>{
+  const cl=CL[node.cl];
+  const px=cl.center[0]+node.o[0];
+  const py=cl.center[1]+node.o[1];
+  const pz=cl.center[2]+node.o[2];
+
+  // Add per-node drift offset (small random float position)
+  node._drift={x:Math.random()*Math.PI*2,y:Math.random()*Math.PI*2,z:Math.random()*Math.PI*2};
+  node._driftAmp=0.6+Math.random()*0.8;
+  node._basePos=new THREE.Vector3(px,py,pz);
+  node._pos=new THREE.Vector3(px,py,pz);
+  node._sz=nodeSize(node.cc);
+
+  // Core sphere
+  const coreMat=new THREE.MeshBasicMaterial({color:node.t.color,transparent:true,opacity:.9,depthWrite:false});
+  const core=new THREE.Mesh(coreGeo,coreMat);
+  core.scale.setScalar(node._sz);
+  core.position.copy(node._pos);
+  scene.add(core);
+
+  // Inner halo — slightly larger, same color, more transparent
+  const haloMat=new THREE.MeshBasicMaterial({color:node.t.color,transparent:true,opacity:.18,depthWrite:false,side:THREE.BackSide});
+  const halo=new THREE.Mesh(haloGeo,haloMat);
+  halo.scale.setScalar(node._sz*2.4);
+  halo.position.copy(node._pos);
+  scene.add(halo);
+
+  // Outer aura — even larger, very faint
+  const auraMat=new THREE.MeshBasicMaterial({color:node.t.color,transparent:true,opacity:.05,depthWrite:false,side:THREE.BackSide});
+  const aura=new THREE.Mesh(haloGeo,auraMat);
+  aura.scale.setScalar(node._sz*4.5);
+  aura.position.copy(node._pos);
+  scene.add(aura);
+
+  node._core=core;node._coreMat=coreMat;
+  node._halo=halo;node._haloMat=haloMat;
+  node._aura=aura;node._auraMat=auraMat;
+  nodeMeshes.push({mesh:core,node});
+});
+
+// ── CURVED EDGES (bezier via tube geometry) ────────────────
+const edgeMeshes=[];
+
+function makeCurvedEdge(na,nb){
+  const a=na._pos.clone();
+  const b=nb._pos.clone();
+  const mid=a.clone().add(b).multiplyScalar(0.5);
+  // Arc perpendicular to the line, with random offset
+  const len=a.distanceTo(b);
+  const perp=new THREE.Vector3(
+    (Math.random()-0.5)*len*0.35,
+    (Math.random()-0.5)*len*0.35,
+    (Math.random()-0.5)*len*0.35
+  );
+  mid.add(perp);
+  const curve=new THREE.QuadraticBezierCurve3(a,mid,b);
+  const pts=curve.getPoints(20);
+  const geo=new THREE.BufferGeometry().setFromPoints(pts);
+
+  // Vary edge thickness by average connection count
+  const avgCC=(na.cc+nb.cc)/2;
+  const opacity=0.04+Math.min(avgCC*0.006,0.08);
+
+  const mat=new THREE.LineBasicMaterial({
+    color:0xD8D294,transparent:true,opacity,depthWrite:false
+  });
+  const line=new THREE.Line(geo,mat);
+  scene.add(line);
+  edgeMeshes.push({line,mat,na,nb,baseOp:opacity});
+}
+
+EDGE_DEFS.forEach(([aid,bid])=>{
+  const na=nodeById[aid],nb=nodeById[bid];
+  if(na&&nb)makeCurvedEdge(na,nb);
+});
+
+// ── CLUSTER LABEL SPRITES ──────────────────────────────────
+const clusterSprites=[];
+Object.entries(CL).forEach(([key,cl])=>{
+  const c2=document.createElement('canvas');
+  c2.width=512;c2.height=64;
+  const ctx=c2.getContext('2d');
+  ctx.font='bold 22px Syncopate, monospace';
+  ctx.fillStyle='rgba(244,242,238,0.9)';
+  ctx.textAlign='center';
+  ctx.fillText(cl.name,256,40);
+  const tex=new THREE.CanvasTexture(c2);
+  const mat=new THREE.SpriteMaterial({map:tex,transparent:true,opacity:.55,depthWrite:false});
+  const sprite=new THREE.Sprite(mat);
+  sprite.scale.set(90,11,1);
+  sprite.position.set(cl.center[0],cl.center[1]+50,cl.center[2]);
+  scene.add(sprite);
+  clusterSprites.push({sprite,mat,key});
+});
+
+// ── CLUSTER HIT ZONES ──────────────────────────────────────
+const clusterZones=[];
+const hitGeo=new THREE.SphereGeometry(1,8,8);
+Object.entries(CL).forEach(([key,cl])=>{
+  const mat=new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false});
+  const mesh=new THREE.Mesh(hitGeo,mat);
+  mesh.scale.setScalar(55);
+  mesh.position.set(...cl.center);
+  scene.add(mesh);
+  clusterZones.push({key,hitMesh:mesh});
+});
+
+// ── INTERIOR SPARKS (fine particles between clusters) ──────
+const sparkGeo=new THREE.BufferGeometry();
+const sparkPos=[];
+for(let i=0;i<1800;i++){
+  // Random position roughly inside the brain volume
+  const r=Math.random()*100;
+  const th=Math.random()*Math.PI*2;
+  const ph=Math.acos(2*Math.random()-1);
+  sparkPos.push(
+    r*Math.sin(ph)*Math.cos(th)*1.1,
+    r*Math.cos(ph)*0.8,
+    r*Math.sin(ph)*Math.sin(th)*0.9
+  );
+}
+sparkGeo.setAttribute('position',new THREE.Float32BufferAttribute(sparkPos,3));
+const sparkMat=new THREE.PointsMaterial({color:0xD8D294,size:0.5,transparent:true,opacity:.12,depthWrite:false});
+scene.add(new THREE.Points(sparkGeo,sparkMat));
+
+// ── OUTER NEBULA ──────────────────────────────────────────
+const nebGeo=new THREE.BufferGeometry();
+const nebPos=[];
+for(let i=0;i<3000;i++){
+  const r=130+Math.random()*90,th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1);
+  nebPos.push(r*Math.sin(ph)*Math.cos(th),r*Math.cos(ph)*.5,r*Math.sin(ph)*Math.sin(th));
+}
+nebGeo.setAttribute('position',new THREE.Float32BufferAttribute(nebPos,3));
+scene.add(new THREE.Points(nebGeo,new THREE.PointsMaterial({color:0x1a2e22,size:.8,transparent:true,opacity:.25,depthWrite:false})));
+
+// ── RAYCASTER ──────────────────────────────────────────────
+const raycaster=new THREE.Raycaster();
+const mouse2d=new THREE.Vector2(-999,-999);
+let hoveredNode=null,selectedNode=null,hoveredCluster=null;
+
+function checkHover(sx,sy){
+  mouse2d.set((sx/innerWidth)*2-1,-(sy/innerHeight)*2+1);
+  raycaster.setFromCamera(mouse2d,camera);
+  const nodeHits=raycaster.intersectObjects(nodeMeshes.map(n=>n.mesh));
+  if(nodeHits.length>0){
+    const found=nodeMeshes.find(n=>n.mesh===nodeHits[0].object);
+    if(found){hoveredNode=found.node;hoveredCluster=found.node.cl;return;}
+  }
+  hoveredNode=null;
+  const zoneHits=raycaster.intersectObjects(clusterZones.map(z=>z.hitMesh));
+  hoveredCluster=zoneHits.length>0?(clusterZones.find(z=>z.hitMesh===zoneHits[0].object)||{key:null}).key:null;
+}
+
+window.addEventListener('mousemove',e=>{if(!isDragging)checkHover(e.clientX,e.clientY);});
+
+window.addEventListener('click',e=>{
+  if(dragMoved||blockClick)return;
+  checkHover(e.clientX,e.clientY);
+  if(hoveredNode)openDrawer(hoveredNode);else closeDrawer();
+});
+
+// ── DRAWER ─────────────────────────────────────────────────
+function openDrawer(node){
+  selectedNode=node;
+  const cl=CL[node.cl];
+  document.getElementById('dr-cluster').textContent=cl.name;
+  document.getElementById('dr-name').textContent=node.label;
+  const badge=document.getElementById('dr-badge');
+  badge.textContent=node.t.label;badge.style.color=node.t.hex;badge.style.borderColor=node.t.hex+'44';
+  document.getElementById('dr-desc').textContent=node.desc;
+  document.getElementById('dr-count').textContent=node.cc;
+  const list=document.getElementById('dr-conn-list');list.innerHTML='';
+  EDGE_DEFS.filter(([a,b])=>a===node.id||b===node.id)
+    .map(([a,b])=>a===node.id?nodeById[b]:nodeById[a])
+    .filter(Boolean)
+    .forEach(cn=>{
+      const div=document.createElement('div');
+      div.className='dr-conn-item';div.style.borderColor=cn.t.hex+'55';
+      div.innerHTML=`<div class="dr-conn-dot" style="background:${cn.t.hex}"></div>${cn.label}`;
+      list.appendChild(div);
+    });
+  const drawer=document.getElementById('drawer');
+  if(window.innerWidth<=600){
+    drawer.style.cssText='position:fixed;left:0;right:0;bottom:0;width:100%;height:60vh;background:rgba(4,8,6,.98);border-top:1px solid rgba(216,210,148,.1);z-index:40;overflow-y:auto;padding:32px 24px 80px;pointer-events:all;transform:translateY(0);transition:transform .35s cubic-bezier(.4,0,.2,1)';
+    drawer.classList.add('open');
+  } else {
+    drawer.style.cssText='';drawer.classList.add('open');
+  }
+}
+function closeDrawer(){
+  const drawer=document.getElementById('drawer');
+  if(window.innerWidth<=600){
+    drawer.style.transform='translateY(100%)';
+    setTimeout(()=>{drawer.classList.remove('open');drawer.style.cssText='';},350);
+  } else {drawer.classList.remove('open');}
+  selectedNode=null;
+}
+
+// ── FILTER ──────────────────────────────────────────────────
+let activeFilter='ALL',blockClick=false;
+function setFilter(type){
+  blockClick=true;setTimeout(()=>blockClick=false,300);
+  activeFilter=type;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.type===type));
+}
+
+function typeMatch(node){
+  if(activeFilter==='ALL')return true;
+  if(activeFilter==='SCRIPT')return node.t.label==='SCRIPT';
+  if(activeFilter==='API')return node.t.label==='EXTERNAL API';
+  if(activeFilter==='CACHE')return node.t.label==='CACHE / FILE';
+  if(activeFilter==='SLACK')return node.t.label==='SLACK CHANNEL';
+  if(activeFilter==='SERVICE')return node.t.label==='SERVICE';
+  if(activeFilter==='CRON')return node.t.label==='CRON JOB';
+  if(activeFilter==='PROP')return node.t.label==='PROPERTY';
+  return true;
+}
+
+// ── TOUR ────────────────────────────────────────────────────
+let tourActive=false,tourStep=0,tourInterval=null;
+let tourTargetRotX=0,tourTargetRotY=0,tourTargetZ=340,tourLerping=false;
+
+function zoomToNode(node){
+  const cl=CL[node.cl];
+  tourTargetRotY=-Math.atan2(cl.center[0],Math.abs(cl.center[2])+120);
+  tourTargetRotX=Math.atan2(cl.center[1],160)*-0.6;
+  tourTargetZ=200;tourLerping=true;autoRotate=false;
+}
+function showTourStep(){
+  const s=TOUR_STEPS[tourStep];
+  document.getElementById('tp-step').textContent=`STEP ${tourStep+1} / ${TOUR_STEPS.length}`;
+  document.getElementById('tp-title').textContent=s.title;
+  document.getElementById('tp-text').textContent=s.text;
+  const node=nodeById[s.node];
+  if(node){hoveredNode=node;zoomToNode(node);setTimeout(()=>{if(tourActive)hoveredNode=null;},3500);}
+}
+function advanceTour(){
+  tourStep=(tourStep+1)%TOUR_STEPS.length;
+  showTourStep();
+  if(tourStep===0){
+    clearInterval(tourInterval);tourActive=false;
+    document.getElementById('tour-btn').classList.remove('active');
+    document.getElementById('tour-panel').classList.remove('visible');
+    tourTargetZ=340;tourTargetRotX=0;tourLerping=true;
+    setTimeout(()=>autoRotate=true,1500);
+  }
+}
+function toggleTour(){
+  tourActive=!tourActive;
+  document.getElementById('tour-btn').classList.toggle('active',tourActive);
+  document.getElementById('tour-panel').classList.toggle('visible',tourActive);
+  if(tourActive){tourStep=0;showTourStep();tourInterval=setInterval(advanceTour,5500);}
+  else{clearInterval(tourInterval);document.getElementById('tour-panel').classList.remove('visible');tourTargetZ=340;tourTargetRotX=0;tourLerping=true;setTimeout(()=>autoRotate=true,1500);}
+}
+
+// ── ORBIT CONTROLS ──────────────────────────────────────────
+let isDragging=false,prevX=0,prevY=0,velX=0,velY=0,dragMoved=false;
+let rotX=0,rotY=0,autoRotate=true,lastInteract=0;
+let pinchStart=0,pinchCamZ=340;
+
+window.addEventListener('mousedown',e=>{isDragging=true;dragMoved=false;prevX=e.clientX;prevY=e.clientY;autoRotate=false;lastInteract=Date.now();});
+window.addEventListener('mouseup',()=>{isDragging=false;lastInteract=Date.now();});
+window.addEventListener('mousemove',e=>{
+  if(!isDragging)return;
+  const dx=e.clientX-prevX,dy=e.clientY-prevY;
+  if(Math.abs(dx)>3||Math.abs(dy)>3)dragMoved=true;
+  velX=dy*.004;velY=dx*.004;rotX+=velX;rotY+=velY;
+  prevX=e.clientX;prevY=e.clientY;lastInteract=Date.now();
+});
+window.addEventListener('wheel',e=>{
+  camera.position.z=Math.max(80,Math.min(700,camera.position.z+e.deltaY*.3));
+  autoRotate=false;lastInteract=Date.now();
+},{passive:true});
+window.addEventListener('touchstart',e=>{
+  e.preventDefault();const t=Array.from(e.touches);
+  if(t.length===1){isDragging=true;dragMoved=false;prevX=t[0].clientX;prevY=t[0].clientY;autoRotate=false;}
+  else if(t.length===2){isDragging=false;pinchStart=Math.hypot(t[1].clientX-t[0].clientX,t[1].clientY-t[0].clientY);pinchCamZ=camera.position.z;}
+  lastInteract=Date.now();
+},{passive:false});
+window.addEventListener('touchmove',e=>{
+  e.preventDefault();const t=Array.from(e.touches);
+  if(t.length===1&&isDragging){
+    const dx=t[0].clientX-prevX,dy=t[0].clientY-prevY;
+    if(Math.abs(dx)>3||Math.abs(dy)>3)dragMoved=true;
+    velX=dy*.005;velY=dx*.005;rotX+=velX;rotY+=velY;
+    prevX=t[0].clientX;prevY=t[0].clientY;
+  }else if(t.length===2){
+    const d=Math.hypot(t[1].clientX-t[0].clientX,t[1].clientY-t[0].clientY);
+    camera.position.z=Math.max(80,Math.min(700,pinchCamZ*(pinchStart/d)));
+  }
+  lastInteract=Date.now();
+},{passive:false});
+window.addEventListener('touchend',e=>{
+  if(Array.from(e.touches).length===0){
+    if(!dragMoved){
+      const touch=e.changedTouches[0];
+      checkHover(touch.clientX,touch.clientY);
+      if(hoveredNode)openDrawer(hoveredNode);
+    }
+    isDragging=false;lastInteract=Date.now();
+  }
+});
+
+// ── ANIMATE ─────────────────────────────────────────────────
+const clock=new THREE.Clock();
+
+function animate(){
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+
+  if(!isDragging&&Date.now()-lastInteract>4000)autoRotate=true;
+  if(autoRotate)rotY+=.0018;
+
+  if(tourLerping){
+    rotX+=(tourTargetRotX-rotX)*.04;
+    rotY+=(tourTargetRotY-rotY)*.04;
+    camera.position.z+=(tourTargetZ-camera.position.z)*.04;
+    if(Math.abs(tourTargetZ-camera.position.z)<0.1)tourLerping=false;
+  }
+  if(!isDragging&&!tourLerping){velX*=.9;velY*=.9;rotX+=velX;rotY+=velY;}
+  rotX=Math.max(-1.2,Math.min(1.2,rotX));
+  scene.rotation.x=rotX;scene.rotation.y=rotY;
+
+  // Per-node async drift + pulse
+  nodeMeshes.forEach(({mesh,node})=>{
+    const isHov=hoveredNode===node;
+    const isSel=selectedNode===node;
+    const isConn=hoveredNode&&EDGE_DEFS.some(([a,b])=>(a===hoveredNode.id&&b===node.id)||(b===hoveredNode.id&&a===node.id));
+    const inCluster=hoveredCluster&&node.cl===hoveredCluster;
+    const tm=typeMatch(node);
+
+    // Async per-node pulse — each fires at its own frequency and phase
+    const pulse=0.55+Math.sin(t*node._freq+node._phase)*0.45;
+
+    // Drift — tiny float movement
+    const driftX=Math.sin(t*0.3+node._drift.x)*node._driftAmp;
+    const driftY=Math.sin(t*0.25+node._drift.y)*node._driftAmp;
+    const driftZ=Math.sin(t*0.2+node._drift.z)*node._driftAmp;
+    node._pos.set(node._basePos.x+driftX,node._basePos.y+driftY,node._basePos.z+driftZ);
+    mesh.position.copy(node._pos);
+    node._halo.position.copy(node._pos);
+    node._aura.position.copy(node._pos);
+
+    // Opacity logic
+    let targetCorOp,targetHaloOp,targetAuraOp,targetSz;
+    if(!tm){
+      targetCorOp=.03;targetHaloOp=.01;targetAuraOp=0;targetSz=node._sz*.7;
+    } else if(isHov||isSel){
+      targetCorOp=1;targetHaloOp=.35;targetAuraOp=.12;targetSz=node._sz*1.8;
+    } else if(isConn){
+      targetCorOp=.92;targetHaloOp=.22;targetAuraOp=.07;targetSz=node._sz*1.3;
+    } else if(hoveredNode&&inCluster){
+      targetCorOp=.5;targetHaloOp=.12;targetAuraOp=.03;targetSz=node._sz;
+    } else if(hoveredNode){
+      targetCorOp=.1;targetHaloOp=.02;targetAuraOp=0;targetSz=node._sz*.95;
+    } else if(inCluster){
+      targetCorOp=.85*pulse;targetHaloOp=.18*pulse;targetAuraOp=.05;targetSz=node._sz*1.06;
+    } else {
+      targetCorOp=pulse*0.75;targetHaloOp=pulse*0.14;targetAuraOp=pulse*0.03;
+      targetSz=node._sz*(0.94+Math.sin(t*node._freq*0.5+node._phase)*0.07);
+    }
+
+    const s=.08;
+    node._coreMat.opacity+=(targetCorOp-node._coreMat.opacity)*s;
+    node._haloMat.opacity+=(targetHaloOp-node._haloMat.opacity)*s;
+    node._auraMat.opacity+=(targetAuraOp-node._auraMat.opacity)*s;
+    const curSz=mesh.scale.x;
+    mesh.scale.setScalar(curSz+(targetSz-curSz)*s);
+    node._halo.scale.setScalar(mesh.scale.x*2.4);
+    node._aura.scale.setScalar(mesh.scale.x*4.5);
+  });
+
+  // Edge opacity
+  edgeMeshes.forEach(({mat,na,nb,baseOp},i)=>{
+    const isActive=hoveredNode&&(na===hoveredNode||nb===hoveredNode);
+    const inCluster=hoveredCluster&&(na.cl===hoveredCluster||nb.cl===hoveredCluster);
+    let targetOp;
+    if(isActive) targetOp=Math.min(baseOp*8,0.6);
+    else if(hoveredNode) targetOp=baseOp*0.15;
+    else if(inCluster) targetOp=baseOp*2.5;
+    else targetOp=baseOp*(0.7+Math.sin(t*0.4+i*0.5)*0.3);
+    mat.opacity+=(targetOp-mat.opacity)*.07;
+    if(isActive)mat.color.setHex(na.t.color);else mat.color.setHex(0xD8D294);
+  });
+
+  // Cluster label brightness
+  clusterSprites.forEach(({mat,key})=>{
+    const active=hoveredCluster===key;
+    const tOp=active?0.95:hoveredCluster?0.28:0.55;
+    mat.opacity+=(tOp-mat.opacity)*.06;
+  });
+
+  // Interior spark shimmer
+  sparkMat.opacity=0.08+Math.sin(t*0.7)*0.05;
+
+  renderer.render(scene,camera);
+}
+animate();
+</script>
+</body>
+</html>
